@@ -1,0 +1,4 @@
+<logging>
+  <level>PRODUCTION_LOGGING.properties</level>
+  <stdOutLogging>false</stdOutLogging>
+</logging>

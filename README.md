@@ -17,7 +17,7 @@ Based on [buehner/tomcat](https://github.com/buehner/docker-tomcat):
 
 `docker run -it -p 80:8080 {YOUR_TAG}`
 
-Check http://localhost/geoserver to see the geoserver page.
+Check http://localhost/geoserver to see the geoserver page and **login with** `admin:admin`
 
 #### How to build a specific GeoServer version?
 

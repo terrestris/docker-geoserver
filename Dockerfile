@@ -8,7 +8,7 @@ ARG GS_VERSION=2.12.1
 # Environment variables
 ENV GEOSERVER_VERSION=$GS_VERSION
 ENV MARLIN_VERSION=0.8.2
-ENV GEOSERVER_DATA_DIR=/opt/geoserver_data
+ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 
 # see http://docs.geoserver.org/stable/en/user/production/container.html
 ENV JAVA_OPTS='-Xms256m -Xmx1g -D-XX:SoftRefLRUPolicyMSPerMB=36000 -Xbootclasspath/a:$CATALINA_HOME/lib/marlin.jar -Xbootclasspath/p:$CATALINA_HOME/lib/marlin-sun-java2d.jar -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine'
@@ -27,6 +27,8 @@ RUN curl -jkSL -o /tmp/geoserver.zip http://downloads.sourceforge.net/project/ge
     unzip -q $CATALINA_HOME/webapps/geoserver.war -d $CATALINA_HOME/webapps/geoserver && \
     rm $CATALINA_HOME/webapps/geoserver.war && \
     mkdir $GEOSERVER_DATA_DIR
+
+COPY ./geoserver_data/ $GEOSERVER_DATA_DIR
 
 # install java advanced imaging
 RUN wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
