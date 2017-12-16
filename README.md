@@ -18,3 +18,7 @@ Based on [buehner/tomcat](https://github.com/buehner/docker-tomcat):
 `docker run -it -p 80:8080 {YOUR_TAG}`
 
 Check http://localhost/geoserver to see the geoserver page.
+
+#### How to build a specific GeoServer version?
+
+`docker build --build-arg GS_VERSION={YOUR_VERSION} -t {YOUR_TAG} .`
