@@ -42,8 +42,6 @@ RUN wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-l
 RUN curl -jkSL -o $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_VERSION/marlin-$MARLIN_VERSION-Unsafe.jar && \
     curl -jkSL -o $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_VERSION/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
-RUN apk add --no-cache gdal --repository http://nl.alpinelinux.org/alpine/edge/testing
-
 # cleanup
 RUN apk del curl && \
     rm -rf /tmp/* /var/cache/apk/*
