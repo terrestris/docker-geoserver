@@ -11,6 +11,7 @@ Based on [buehner/tomcat](https://github.com/buehner/docker-tomcat):
   * Marlin renderer
   * Strong cryptography enabled (Hash/Digest)
   * Default logging profile: PRODUCTION
+  * Default WFS service level: Basic
 
 #### How to build?
 
@@ -18,9 +19,11 @@ Based on [buehner/tomcat](https://github.com/buehner/docker-tomcat):
 
 #### How to quickstart?
 
+Build the image as described above, then:
+
 `docker run -it -p 80:8080 {YOUR_TAG}`
 
-Check http://localhost/geoserver to see the geoserver page and **login with** `admin:admin`
+Check http://localhost/geoserver to see the geoserver page and login with geoserver defaults `admin:geoserver`
 
 #### How to build a specific GeoServer version?
 
