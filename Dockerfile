@@ -4,6 +4,7 @@ FROM buehner/tomcat:latest
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG GS_VERSION=2.12.1
+ARG GS_DATA_PATH=./geoserver_data/
 
 # Environment variables
 ENV GEOSERVER_VERSION=$GS_VERSION
@@ -28,7 +29,7 @@ RUN curl -jkSL -o /tmp/geoserver.zip http://downloads.sourceforge.net/project/ge
     rm $CATALINA_HOME/webapps/geoserver.war && \
     mkdir $GEOSERVER_DATA_DIR
 
-COPY ./geoserver_data/ $GEOSERVER_DATA_DIR
+COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 
 # install java advanced imaging
 RUN wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \

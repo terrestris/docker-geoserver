@@ -29,6 +29,18 @@ Check http://localhost/geoserver to see the geoserver page and login with geoser
 
 `docker build --build-arg GS_VERSION={YOUR_VERSION} -t {YOUR_TAG} .`
 
+#### How to build with custom geoserver data?
+
+`docker build --build-arg GS_DATA_PATH={RELATIVE_PATH_TO_YOUR_GS_DATA} .`
+
+**Note:** The passed path **must not** be absolute! Instead, the path should be within the build context (e.g. next to the Dockerfile) and should be passed as a relative path, e.g. `GS_DATA_PATH=./my_data/`
+
+#### Can i build a specific GS version with custom data?
+
+Yes! Just pass the `--build-arg` param twice, e.g.
+
+`... --build-arg GS_VERSION={VERSION} --build-arg GS_DATA_PATH={PATH} ...`
+
 #### How to watch geoserver.log from host?
 
 `docker exec -it {CONTAINER_ID} tail -f /opt/geoserver_data/logs/geoserver.log`
