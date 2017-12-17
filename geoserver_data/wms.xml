@@ -34,6 +34,11 @@
     <entry key="scalehintMapunitsPixel">false</entry>
     <entry key="framesDelay">1000</entry>
   </metadata>
+  <srs>
+    <string>4326</string>
+    <string>3857</string>
+    <string>900913</string>
+  </srs>
   <watermark>
     <enabled>false</enabled>
     <position>BOT_RIGHT</position>
