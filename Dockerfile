@@ -40,6 +40,11 @@ RUN wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-l
     mv /tmp/jai_imageio-1_1/lib/*.jar $JAVA_HOME/jre/lib/ext/ && \
     mv /tmp/jai_imageio-1_1/lib/*.so $JAVA_HOME/jre/lib/amd64/
 
+# uninstall JAI default installation from geoserver to avoid classpath conflicts
+# see http://docs.geoserver.org/latest/en/user/production/java.html#install-native-jai-and-imageio-extensions
+WORKDIR $CATALINA_HOME/webapps/geoserver/WEB-INF/lib
+RUN rm jai_core-*jar jai_imageio-*.jar jai_codec-*.jar
+
 # install marlin renderer
 RUN curl -jkSL -o $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_VERSION/marlin-$MARLIN_VERSION-Unsafe.jar && \
     curl -jkSL -o $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_VERSION/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
