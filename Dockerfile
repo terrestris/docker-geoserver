@@ -11,7 +11,7 @@ ENV MARLIN_VERSION=0.8.2
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 
 # see http://docs.geoserver.org/stable/en/user/production/container.html
-ENV CATALINA_OPTS='-Xms256m -Xmx1g -D-XX:SoftRefLRUPolicyMSPerMB=36000 -Xbootclasspath/a:$CATALINA_HOME/lib/marlin.jar -Xbootclasspath/p:$CATALINA_HOME/lib/marlin-sun-java2d.jar -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine'
+ENV CATALINA_OPTS='-Xms256m -Xmx1g -D-XX:SoftRefLRUPolicyMSPerMB=36000 -Xbootclasspath/a:$CATALINA_HOME/lib/marlin.jar -Xbootclasspath/p:$CATALINA_HOME/lib/marlin-sun-java2d.jar -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine -Dorg.geotools.coverage.jaiext.enabled=true'
 
 WORKDIR /tmp
 
