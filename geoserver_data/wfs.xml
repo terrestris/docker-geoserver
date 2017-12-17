@@ -2,6 +2,9 @@
   <id>WFSInfoImpl--64948579:160615a51e4:-7ffa</id>
   <enabled>true</enabled>
   <name>WFS</name>
+  <title>GeoServer Web Feature Service</title>
+  <maintainer>terrestris</maintainer>
+  <abstrct>A compliant implementation of WFS service.</abstrct>
   <versions>
     <org.geotools.util.Version>
       <version>1.0.0</version>
@@ -14,6 +17,7 @@
     </org.geotools.util.Version>
   </versions>
   <citeCompliant>false</citeCompliant>
+  <onlineResource>https://www.terrestris.de/</onlineResource>
   <schemaBaseURL>http://schemas.opengis.net</schemaBaseURL>
   <verbose>false</verbose>
   <metadata>
@@ -28,17 +32,17 @@
       </gml>
     </entry>
     <entry>
-      <version>V_10</version>
-      <gml>
-        <srsNameStyle>XML</srsNameStyle>
-        <overrideGMLAttributes>true</overrideGMLAttributes>
-      </gml>
-    </entry>
-    <entry>
       <version>V_11</version>
       <gml>
         <srsNameStyle>URN</srsNameStyle>
         <overrideGMLAttributes>false</overrideGMLAttributes>
+      </gml>
+    </entry>
+    <entry>
+      <version>V_10</version>
+      <gml>
+        <srsNameStyle>XML</srsNameStyle>
+        <overrideGMLAttributes>true</overrideGMLAttributes>
       </gml>
     </entry>
   </gml>
