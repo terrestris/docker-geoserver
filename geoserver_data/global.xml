@@ -1,5 +1,6 @@
 <global>
   <settings>
+    <id>SettingsInfoImpl--4a761455:1606460d7f9:-8000</id>
     <contact>
       <id>contact</id>
       <address>Kölnstr. 99</address>
@@ -146,7 +147,7 @@
     <queueType>UNBOUNDED</queueType>
     <imageIOCacheThreshold>10240</imageIOCacheThreshold>
   </coverageAccess>
-  <updateSequence>1</updateSequence>
+  <updateSequence>6</updateSequence>
   <featureTypeCacheSize>0</featureTypeCacheSize>
   <globalServices>true</globalServices>
   <xmlPostRequestLogBufferSize>1024</xmlPostRequestLogBufferSize>
