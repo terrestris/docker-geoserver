@@ -5,11 +5,13 @@ FROM buehner/tomcat:latest
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG GS_VERSION=2.12.1
 ARG GS_DATA_PATH=./geoserver_data/
+ARG ADDITIONAL_LIBS_PATH=./additional_libs/
 
 # Environment variables
 ENV GEOSERVER_VERSION=$GS_VERSION
 ENV MARLIN_VERSION=0.8.2
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
+ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
 
 # see http://docs.geoserver.org/stable/en/user/production/container.html
 ENV CATALINA_OPTS='-Xms256m -Xmx1g -Dfile.encoding=UTF-8 -D-XX:SoftRefLRUPolicyMSPerMB=36000 -Xbootclasspath/a:$CATALINA_HOME/lib/marlin.jar -Xbootclasspath/p:$CATALINA_HOME/lib/marlin-sun-java2d.jar -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine -Dorg.geotools.coverage.jaiext.enabled=true'
@@ -30,6 +32,7 @@ RUN curl -jkSL -o /tmp/geoserver.zip http://downloads.sourceforge.net/project/ge
     mkdir $GEOSERVER_DATA_DIR
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
+COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
 
 # install java advanced imaging
 RUN wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
@@ -43,7 +46,7 @@ RUN wget http://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-l
 
 # uninstall JAI default installation from geoserver to avoid classpath conflicts
 # see http://docs.geoserver.org/latest/en/user/production/java.html#install-native-jai-and-imageio-extensions
-WORKDIR $CATALINA_HOME/webapps/geoserver/WEB-INF/lib
+WORKDIR $GEOSERVER_LIB_DIR
 RUN rm jai_core-*jar jai_imageio-*.jar jai_codec-*.jar
 
 # install marlin renderer

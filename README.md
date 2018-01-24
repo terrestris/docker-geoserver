@@ -23,6 +23,10 @@ Build the image as described above, then:
 
 `docker run -it -p 80:8080 {YOUR_TAG}`
 
+or if you want to start the container daemonized:
+
+`docker run -d -p 80:8080 {YOUR_TAG}`
+
 Check http://localhost/geoserver to see the geoserver page and login with geoserver defaults `admin:geoserver`
 
 #### How to build a specific GeoServer version?
@@ -40,6 +44,14 @@ Check http://localhost/geoserver to see the geoserver page and login with geoser
 Yes! Just pass the `--build-arg` param twice, e.g.
 
 `... --build-arg GS_VERSION={VERSION} --build-arg GS_DATA_PATH={PATH} ...`
+
+#### How to build with additional libs/extensions/plugins?
+
+Put your `*.jar` files (e.g. the WPS extension) in the `additional_libs` folder and build with one of the commands from above! (They will be copied to the GeoServer `WEB-INF/lib` folder during the build.)
+
+**Note:** Similar to the GeoServer data path from above, you can also configure the path to the additional libraries by passing the `ADDITIONAL_LIBS_PATH` argument when building:
+
+`--build-arg ADDITIONAL_LIBS_PATH={RELATIVE_PATH_TO_YOUR_LIBS}`
 
 #### How to watch geoserver.log from host?
 
