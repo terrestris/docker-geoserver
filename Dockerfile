@@ -21,6 +21,7 @@ WORKDIR /tmp
 # init
 RUN apk -U upgrade --update && \
     apk add curl && \
+    apk add openssl && \
     rm -rf $CATALINA_HOME/webapps/*
 
 # install geoserver
