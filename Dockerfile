@@ -3,14 +3,14 @@ FROM terrestris/tomcat:latest
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG GS_VERSION=2.13.0
+ARG GS_VERSION=2.13.1
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
 
 # Environment variables
 ENV GEOSERVER_VERSION=$GS_VERSION
-ENV MARLIN_TAG=0_9_1
-ENV MARLIN_VERSION=0.9.1
+ENV MARLIN_TAG=0_9_2
+ENV MARLIN_VERSION=0.9.2
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
 
