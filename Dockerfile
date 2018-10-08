@@ -59,4 +59,8 @@ RUN curl -jkSL -o $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marl
 RUN apk del curl && \
     rm -rf /tmp/* /var/cache/apk/*
 
+COPY startup.sh /opt/startup.sh
+
+ENTRYPOINT /opt/startup.sh
+
 WORKDIR /opt
