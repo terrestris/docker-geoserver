@@ -23,7 +23,7 @@ WORKDIR /tmp
 RUN apk -U upgrade --update && \
     apk add curl && \
     apk add openssl && \
-    apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/main libressl2.7-libcrypto && \
+    apk add libressl2.7-libcrypto && \
     apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing gdal && \
     rm -rf $CATALINA_HOME/webapps/*
 
