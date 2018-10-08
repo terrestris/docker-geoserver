@@ -53,6 +53,18 @@ Put your `*.jar` files (e.g. the WPS extension) in the `additional_libs` folder 
 
 `--build-arg ADDITIONAL_LIBS_PATH={RELATIVE_PATH_TO_YOUR_LIBS}`
 
+## How to add additional libs using an existing docker image?
+
+If you want to add geoserver extensions/libs by using a mount, you can add something like
+
+```
+--mount src="/dir/with/libs/on/host",target=/opt/additional_libs,type=bind
+```
+
+to your `docker run` command.
+
+**Note:** Do not change the target value!
+
 ## How to watch geoserver.log from host?
 
 `docker exec -it {CONTAINER_ID} tail -f /opt/geoserver_data/logs/geoserver.log`
