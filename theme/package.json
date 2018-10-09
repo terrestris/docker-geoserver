@@ -9,8 +9,7 @@
   "author": "Andre Henn",
   "license": "MIT",
   "dependencies": {
-    "bootstrap": "^3.3.7",
-    "less": "2.7.2",
+    "less": "^3.8.1",
     "less-plugin-clean-css": "1.5.1"
   }
 }
