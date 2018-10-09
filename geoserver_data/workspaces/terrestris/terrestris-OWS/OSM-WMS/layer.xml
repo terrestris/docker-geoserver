@@ -1,0 +1,15 @@
+<layer>
+  <name>OSM-WMS</name>
+  <id>LayerInfoImpl--7cdcab78:16659a17fbe:-7ffb</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--570ae188:124761b8d78:-7fe2</id>
+  </defaultStyle>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--7cdcab78:16659a17fbe:-7ffc</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

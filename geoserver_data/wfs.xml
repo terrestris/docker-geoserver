@@ -1,10 +1,12 @@
 <wfs>
-  <id>WFSInfoImpl--64948579:160615a51e4:-7ffa</id>
+  <id>wfs</id>
   <enabled>true</enabled>
   <name>WFS</name>
   <title>GeoServer Web Feature Service</title>
-  <maintainer>terrestris</maintainer>
-  <abstrct>A compliant implementation of WFS service.</abstrct>
+  <maintainer>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10311</maintainer>
+  <abstrct>This is the reference implementation of WFS 1.0.0 and WFS 1.1.0, supports all WFS operations including Transaction.</abstrct>
+  <accessConstraints>NONE</accessConstraints>
+  <fees>NONE</fees>
   <versions>
     <org.geotools.util.Version>
       <version>1.0.0</version>
@@ -16,14 +18,24 @@
       <version>2.0.0</version>
     </org.geotools.util.Version>
   </versions>
+  <keywords>
+    <string>WFS</string>
+    <string>WMS</string>
+    <string>GEOSERVER</string>
+  </keywords>
+  <metadataLink/>
   <citeCompliant>false</citeCompliant>
-  <onlineResource>https://www.terrestris.de/</onlineResource>
+  <onlineResource>http://geoserver.sourceforge.net/html/index.php</onlineResource>
   <schemaBaseURL>http://schemas.opengis.net</schemaBaseURL>
   <verbose>false</verbose>
-  <metadata>
-    <entry key="SHAPE-ZIP_DEFAULT_PRJ_IS_ESRI">false</entry>
-  </metadata>
   <gml>
+    <entry>
+      <version>V_10</version>
+      <gml>
+        <srsNameStyle>XML</srsNameStyle>
+        <overrideGMLAttributes>true</overrideGMLAttributes>
+      </gml>
+    </entry>
     <entry>
       <version>V_20</version>
       <gml>
@@ -38,17 +50,10 @@
         <overrideGMLAttributes>false</overrideGMLAttributes>
       </gml>
     </entry>
-    <entry>
-      <version>V_10</version>
-      <gml>
-        <srsNameStyle>XML</srsNameStyle>
-        <overrideGMLAttributes>true</overrideGMLAttributes>
-      </gml>
-    </entry>
   </gml>
-  <serviceLevel>BASIC</serviceLevel>
+  <serviceLevel>COMPLETE</serviceLevel>
   <maxFeatures>1000000</maxFeatures>
-  <featureBounding>true</featureBounding>
+  <featureBounding>false</featureBounding>
   <canonicalSchemaLocation>false</canonicalSchemaLocation>
   <encodeFeatureMember>false</encodeFeatureMember>
   <hitsIgnoreMaxFeatures>false</hitsIgnoreMaxFeatures>

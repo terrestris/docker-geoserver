@@ -1,1 +1,0 @@
-INFO [geoserver.logging] - Suppressing StdOut logging.  If you want to see GeoServer logs, be sure to look in '/opt/geoserver_data/logs/geoserver.log'
