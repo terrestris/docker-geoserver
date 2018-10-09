@@ -1,0 +1,128 @@
+/*-----------------------
+Button  Styles
+-----------------------*/
+.button-group a,
+.button-group button,
+input.btnTxt {
+  background: lighten(@secondary-color, 40%) url("../img/button-gradient.png") top left repeat-x;
+  border: 1px solid @secondary-color;
+  font-size: 0.9em;
+  font-weight: bold;
+  text-decoration: none;
+  color: @base-color;
+  cursor: pointer;
+  padding: 5px 10px 5px 7px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.button-group button {
+  width: auto;
+  overflow: visible;
+}
+
+*:first-child+html button[type],
+*:first-child+html input.btnTxt {
+  padding: 4px 10px 3px;
+  /* IE7 */
+}
+
+* html .button-group button,
+* html input.btnTxt {
+  padding: 4px 10px 3px 7px;
+  /* IE6 */
+}
+
+.button-group a:hover,
+.button-group button:hover,
+input.btnTxt:hover {
+  background-color: lighten(@secondary-color, 40%);
+  color: @base-color;
+}
+
+.button-group a.icon,
+.button-group button.icon {
+  /* assumption is that the contained div will have padding applied */
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.button-group a.icon div,
+.button-group button.icon div {
+  /* assumption is that the contained div will have padding applied */
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-position: 0 50%;
+  background-repeat: no-repeat;
+}
+*:first-child+html .button-group a.icon div,
+/* IE7 */
+* html .button-group button a.icon div {
+  /*IE6 */
+  padding-top: 4px;
+  padding-bottom: 3px;
+}
+
+.button-group input {
+  margin-right: 5px;
+}
+
+.button-group .button-login div {
+  background-image: url("../img/icons/silk/door-in.png");
+  padding-left: 25px;
+}
+
+.button-group .button-logout span {
+  background: url("../img/icons/silk/door-out.png") no-repeat;
+  display: block;
+  margin: 5px;
+  padding-left: 25px;
+}
+
+.button-group .button-save div {
+  background-image: url("../img/icons/silk/disk.png");
+  padding-left: 18px;
+}
+
+.button-group .button-revert div {
+  background-image: url("../img/icons/silk/arrow_redo.png");
+  padding-left: 25px;
+}
+
+.button-group .button-fullscreen span {
+  background: url("../img/icons/silk/arrow_out.png") no-repeat;
+  display: block;
+}
+
+.button-group .button-undo span {
+  background: url("../img/icons/silk/arrow_undo.png") no-repeat;
+  display: block;
+}
+
+.button-group .button-redo span {
+  background: url("../img/icons/silk/arrow_redo.png") no-repeat;
+  display: block;
+}
+
+.button-group .button-goto span {
+  background: url("../img/icons/silk/xhtml_go.png") no-repeat;
+  display: block;
+}
+
+.button-group .button-reformat span {
+  background: url("../img/icons/silk/text_align_right.png") no-repeat;
+  display: block;
+}
+
+.button-group a img,
+button img {
+  vertical-align: middle;
+  margin: -1px 0.3em -1px 0;
+}
+
+.button-group a,
+.button-group button {
+  float: left;
+  margin: 0 0.58em 0 0;
+}

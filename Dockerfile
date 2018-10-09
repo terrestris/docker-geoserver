@@ -24,16 +24,31 @@ RUN apk -U upgrade --update && \
     apk add curl && \
     apk add openssl && \
     apk add libressl2.7-libcrypto && \
+    apk add zip && \
     apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing gdal && \
     rm -rf $CATALINA_HOME/webapps/*
 
 # install geoserver
 RUN curl -jkSL -o /tmp/geoserver.zip http://downloads.sourceforge.net/project/geoserver/GeoServer/$GEOSERVER_VERSION/geoserver-$GEOSERVER_VERSION-war.zip && \
     unzip geoserver.zip geoserver.war -d $CATALINA_HOME/webapps && \
-    mkdir $CATALINA_HOME/webapps/geoserver && \
+    mkdir -p $CATALINA_HOME/webapps/geoserver && \
     unzip -q $CATALINA_HOME/webapps/geoserver.war -d $CATALINA_HOME/webapps/geoserver && \
     rm $CATALINA_HOME/webapps/geoserver.war && \
-    mkdir $GEOSERVER_DATA_DIR
+    mkdir -p $GEOSERVER_DATA_DIR
+
+# apply custom css by extracting JAR,
+# replacing css and repacking the JAR
+RUN mkdir -p ${GEOSERVER_LIB_DIR}tmp_extract
+WORKDIR ${GEOSERVER_LIB_DIR}tmp_extract
+
+RUN unzip -q ../gs-web-core-${GEOSERVER_VERSION}.jar
+COPY ./theme/terrestris-geoserver-build.css org/geoserver/web/css/geoserver.css
+COPY ./theme/logo_terrestris.png org/geoserver/web/img/logo_terrestris.png
+
+RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar *
+RUN cd .. && rm -rf tmp_extract
+
+WORKDIR /tmp
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
