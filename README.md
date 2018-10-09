@@ -1,5 +1,7 @@
 # A geoserver docker image
 
+This Dockerfile can be used to create images for all geoserver versions since 2.5.
+
 Based on [terrestris/tomcat](https://github.com/terrestris/docker-tomcat):
 
 * Alpine Linux
