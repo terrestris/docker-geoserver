@@ -1,0 +1,200 @@
+@import './variables.less';
+@import './components/body.less';
+@import './components/header.less';
+@import './components/sidebar.less';
+@import './components/structuralElements.less';
+@import './components/util.less';
+@import './components/button.less';
+@import './components/table.less';
+
+/*-----------------------
+Welcome / Overview
+-------------------------*/
+#welcome {
+  float: left;
+  max-width: 500px;
+}
+
+#welcome table {
+  margin-bottom: 1em;
+}
+/*-----------------------
+Capabilities
+-------------------------*/
+#capabilities {
+  float: right;
+  padding-right: 50px;
+}
+
+div#capabilities ul {
+  list-style-type: none;
+}
+
+/* Tabs */
+.tab-row {
+  border: 1px solid #bbb;
+  border-width: 0 0 1px;
+  height: 2.1em;
+  margin: 1.5em 0 2.5em;
+}
+
+.tab-row-compact {
+  margin: 1.5em 0 1em;
+}
+
+.tab-row ul {
+  list-style-type: none;
+  margin: 0;
+  float: left;
+}
+
+.tab-row li {
+  float: left;
+  margin: 0 0.2em 0 0;
+  padding: 0;
+}
+
+.tab-row a {
+  display: block;
+  color: #222;
+  text-decoration: none;
+  font-weight: bold;
+  background: #ddd;
+  margin: 0 0 -1px;
+  padding: 0.25em 1em;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #aaa;
+  border-bottom: 1px solid #bbb;
+  border-left: 1px solid #ccc;
+}
+
+.tab-row .selected a:link,
+.tab-row .selected a:visited {
+  background: #fff;
+  border-bottom: 1px solid #fff;
+}
+
+.tab-row a:active,
+.tab-row a:hover {
+  background: #eee;
+}
+
+.tab-row .selected a:active,
+.tab-row .selected a:hover {
+  background: #fefefb;
+}
+/* redundant to .selfclear, but with the default wicket tab functionality we don't have the markup control we'd need to avoid this */
+.tab-row ul:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+.tab-row ul {
+  display: inline-block;
+  /* IE 7 */
+}
+
+.tab-row ul {
+  display: block;
+}
+
+* html .tab-row ul {
+  height: 1px;
+  /* IE < 7 */
+}
+
+.devtoolbar {
+  background-color: #EEEEEE;
+}
+/*-----------
+Add/remove icons for add/remove links
+-------------*/
+.add-link {
+  background: transparent url("../img/icons/silk/add.png") scroll no-repeat left center;
+  padding: 2px 0 2px 20px;
+}
+
+.remove-link {
+  background: transparent url("../img/icons/silk/delete.png") scroll no-repeat left center;
+  padding: 2px 0 2px 20px;
+}
+
+.warning-link {
+  background: transparent url("../img/icons/silk/error.png") scroll no-repeat left center;
+  padding: 2px 0 2px 20px;
+}
+
+.refresh-link {
+  background: transparent url("../img/icons/silk/arrow_refresh.png") scroll no-repeat left center;
+  padding: 2px 0 2px 20px;
+}
+
+.info-link {
+  background: transparent url("../img/icons/silk/information.png") scroll no-repeat left center;
+  padding: 2px 0 2px 20px;
+}
+
+.help-link {
+  background: transparent url("../img/icons/silk/help.png") scroll no-repeat left center;
+  padding: 2px 0 2px 20px;
+}
+
+.edit-link {
+  background: transparent url("../img/icons/silk/pencil.png") scroll no-repeat left center;
+  padding: 2px 0 2px 20px;
+}
+
+legend a.help-link {
+  width: 16px;
+  height: 16px;
+}
+
+.computeLink {
+  display: block;
+  margin-bottom: 1em;
+}
+/*----------------
+  Page header
+-----------------*/
+.page-header p {
+  margin-bottom: 0;
+}
+
+.page-header h1 {
+  margin-top: 10px;
+}
+
+.page-header ul {
+  margin: 0.2em;
+  /* override blueprint's settings for unordered lists */
+  list-style-type: none;
+}
+/*----------------
+  Page pane
+-----------------*/
+.page-pane {
+  margin-top: 20px;
+}
+/*-------------
+  Customize Wicket's autocomplete
+  -------------*/
+div.wicket-aa {
+  background-color: white;
+  border: 1px solid #CCCCCC;
+  color: black;
+}
+
+div.wicket-aa ul {
+  list-style-image: none;
+  list-style-position: outside;
+  list-style-type: none;
+  margin: 0;
+  padding: 5px;
+}
+
+div.wicket-aa ul li.selected {
+  background-color: #CCCCCC;
+}
