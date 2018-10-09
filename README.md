@@ -3,15 +3,14 @@
 Based on [terrestris/tomcat](https://github.com/terrestris/docker-tomcat):
 
 * Alpine Linux
-* Java Server JRE 8 (unlimited [JCE Policy](http://docs.geoserver.org/latest/en/user/production/java.html#installing-unlimited-strength-jurisdiction-policy-files))
+* OpenJDK 8
 * Tomcat 8.5
 * GeoServer
   * Native Java advanced imaging (JAI) is installed
   * (but) [JAI-EXT](http://docs.geoserver.org/stable/en/user/configuration/image_processing/index.html#jai-ext) is enabled by default
   * Marlin renderer
-  * Strong cryptography enabled (Hash/Digest)
-  * Default logging profile: PRODUCTION
-  * Default WFS service level: Basic
+
+**IMPORTANT NOTE:** Please change the default geoserver master password! The default masterpw is located in this file (within the docker container): `/opt/geoserver_data/security/masterpw/default/masterpw`
 
 ## How to build?
 
