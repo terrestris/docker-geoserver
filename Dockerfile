@@ -42,8 +42,11 @@ RUN mkdir -p ${GEOSERVER_LIB_DIR}tmp_extract
 WORKDIR ${GEOSERVER_LIB_DIR}tmp_extract
 
 RUN unzip -q ../gs-web-core-${GEOSERVER_VERSION}.jar
-COPY ./theme/terrestris-geoserver-build.css org/geoserver/web/css/geoserver.css
-COPY ./theme/logo_terrestris.png org/geoserver/web/img/logo_terrestris.png
+COPY ./minimalistic.css org/geoserver/web/css/minimalistic.css
+RUN cat org/geoserver/web/css/minimalistic.css >> org/geoserver/web/css/geoserver.css
+
+COPY ./modifications.js org/geoserver/web/js/modifications.js
+RUN sed -i 's|</wicket:head>|<wicket:link><script type="text/javascript" src="js/modifications.js"></script></wicket:link></wicket:head>|g' org/geoserver/web/GeoServerBasePage.html
 
 RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar *
 RUN cd .. && rm -rf tmp_extract
