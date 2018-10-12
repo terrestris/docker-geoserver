@@ -28,12 +28,15 @@
   <onlineResource>http://geoserver.sourceforge.net/html/index.php</onlineResource>
   <schemaBaseURL>http://schemas.opengis.net</schemaBaseURL>
   <verbose>false</verbose>
+  <metadata>
+    <entry key="SHAPE-ZIP_DEFAULT_PRJ_IS_ESRI">false</entry>
+  </metadata>
   <gml>
     <entry>
-      <version>V_10</version>
+      <version>V_11</version>
       <gml>
-        <srsNameStyle>XML</srsNameStyle>
-        <overrideGMLAttributes>true</overrideGMLAttributes>
+        <srsNameStyle>URN</srsNameStyle>
+        <overrideGMLAttributes>false</overrideGMLAttributes>
       </gml>
     </entry>
     <entry>
@@ -44,14 +47,14 @@
       </gml>
     </entry>
     <entry>
-      <version>V_11</version>
+      <version>V_10</version>
       <gml>
-        <srsNameStyle>URN</srsNameStyle>
-        <overrideGMLAttributes>false</overrideGMLAttributes>
+        <srsNameStyle>XML</srsNameStyle>
+        <overrideGMLAttributes>true</overrideGMLAttributes>
       </gml>
     </entry>
   </gml>
-  <serviceLevel>COMPLETE</serviceLevel>
+  <serviceLevel>BASIC</serviceLevel>
   <maxFeatures>1000000</maxFeatures>
   <featureBounding>false</featureBounding>
   <canonicalSchemaLocation>false</canonicalSchemaLocation>

@@ -1,0 +1,15 @@
+<layer>
+  <name>TOPO-OSM-WMS</name>
+  <id>LayerInfoImpl--58a77173:1666865a9a1:-7ff5</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--570ae188:124761b8d78:-7fe2</id>
+  </defaultStyle>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--58a77173:1666865a9a1:-7ff6</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>
