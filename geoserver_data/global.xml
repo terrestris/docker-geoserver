@@ -2,16 +2,19 @@
   <settings>
     <id>SettingsInfoImpl--7cdcab78:16659a17fbe:-8000</id>
     <contact>
-      <addressCity>Alexandria</addressCity>
-      <addressCountry>Egypt</addressCountry>
-      <addressType>Work</addressType>
-      <contactEmail>claudius.ptolomaeus@gmail.com</contactEmail>
-      <contactOrganization>The ancient geographes INC</contactOrganization>
-      <contactPerson>Claudius Ptolomaeus</contactPerson>
-      <contactPosition>Chief geographer</contactPosition>
+      <address>Kölnstr. 99</address>
+      <addressCity>Bonn</addressCity>
+      <addressCountry>Deutschland</addressCountry>
+      <addressPostalCode>53111</addressPostalCode>
+      <addressState>NRW</addressState>
+      <contactEmail>info@terrestris.de</contactEmail>
+      <contactFacsimile>0228 – 962 899 57</contactFacsimile>
+      <contactOrganization>terrestris GmbH &amp; Co. KG</contactOrganization>
+      <contactPerson>terrestris</contactPerson>
+      <contactVoice>0228 – 962 899 51</contactVoice>
     </contact>
     <charset>UTF-8</charset>
-    <numDecimals>8</numDecimals>
+    <numDecimals>4</numDecimals>
     <onlineResource>http://geoserver.org</onlineResource>
     <verbose>false</verbose>
     <verboseExceptions>false</verboseExceptions>
@@ -36,7 +39,7 @@
     <queueType>UNBOUNDED</queueType>
     <imageIOCacheThreshold>10240</imageIOCacheThreshold>
   </coverageAccess>
-  <updateSequence>159</updateSequence>
+  <updateSequence>193</updateSequence>
   <featureTypeCacheSize>0</featureTypeCacheSize>
   <globalServices>true</globalServices>
   <xmlPostRequestLogBufferSize>1024</xmlPostRequestLogBufferSize>
