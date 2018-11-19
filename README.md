@@ -40,7 +40,7 @@ Check http://localhost/geoserver to see the geoserver page and login with geoser
 
 **Note:** The passed path **must not** be absolute! Instead, the path should be within the build context (e.g. next to the Dockerfile) and should be passed as a relative path, e.g. `GS_DATA_PATH=./my_data/`
 
-## Can i build a specific GS version with custom data?
+## Can I build a specific GS version with custom data?
 
 Yes! Just pass the `--build-arg` param twice, e.g.
 
