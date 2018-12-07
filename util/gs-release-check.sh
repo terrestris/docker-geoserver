@@ -64,7 +64,7 @@ done
 if [[ -z "$LATEST_GS_VERSION" ]]; then
   echo "No new 'latest/stable' geoserver version available!"
 else
-  git checkout master #  > /dev/null 2>&1
+  git checkout master > /dev/null 2>&1
   sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$LATEST_GS_VERSION;g" ../Dockerfile
   git commit --allow-empty -m "Update to latest version $LATEST_GS_VERSION" ../Dockerfile
   git push upstream master
