@@ -15,7 +15,9 @@ git checkout master > /dev/null 2>&1
 git pull upstream master > /dev/null 2>&1
 
 # get the current GS version that is used in the docker file
-DOCKER_GS_VERSION=$(cat ../Dockerfile | grep "ARG GS_VERSION" | cut -d'=' -f2)
+LATEST_DOCKER_GS_VERSION=$(cat ../Dockerfile | grep "ARG GS_VERSION" | cut -d'=' -f2)
+
+DOCKER_GS_VERSIONS=$(curl -s "https://api.github.com/repos/terrestris/docker-geoserver/branches?per_page=100" | jq '.[].name' | sed -e 's/"//g' | tac)
 
 # get the last 100 tags/versions of geoserver on github (ordered from old to new)
 GITHUB_GS_VERSIONS=$(curl -s "https://api.github.com/repos/geoserver/geoserver/tags?per_page=100" | jq '.[].name' | sed -e 's/"//g' | tac)
@@ -24,8 +26,20 @@ GITHUB_GS_VERSIONS=$(curl -s "https://api.github.com/repos/geoserver/geoserver/t
 LATEST_GS_VERSION=
 
 for GS_VERSION in $GITHUB_GS_VERSIONS; do
-  if [[ $GS_VERSION =~ ^([0-9.]+)$ ]]; then
-    if version_gt $GS_VERSION $DOCKER_GS_VERSION; then
+  if [[ $GS_VERSION =~ ^([0-9.]+)$ ]] && version_gt $GS_VERSION "2.4.8"; then
+
+    GS_VERSION_EXISTS_ON_DOCKER=false
+
+    # check if our GS_VERSION is already present on docker
+    for DOCKER_GS_VERSION in $DOCKER_GS_VERSIONS; do
+      if [ "${DOCKER_GS_VERSION}" = "v${GS_VERSION}" ]; then
+        GS_VERSION_EXISTS_ON_DOCKER=true
+        break
+      fi
+    done
+
+    if [ "${GS_VERSION_EXISTS_ON_DOCKER}" = false ] ; then
+      echo "v${GS_VERSION} is not yet on docker! A new branch will be created now."
       git checkout master > /dev/null 2>&1
       # create a new branch for the new gs version
       if (git rev-parse --verify "v$GS_VERSION" > /dev/null 2>&1); then
@@ -35,20 +49,22 @@ for GS_VERSION in $GITHUB_GS_VERSIONS; do
       fi
       git checkout -b "v$GS_VERSION" > /dev/null 2>&1
       sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$GS_VERSION;g" ../Dockerfile
-      git commit --allow-empty -m "Update to version $GS_VERSION" ../Dockerfile
+      git commit --allow-empty -m "Update to version $GS_VERSION" ../Dockerfile > /dev/null 2>&1
       git push --force upstream "v$GS_VERSION"
+    fi
 
+    if version_gt $GS_VERSION $LATEST_DOCKER_GS_VERSION; then
       # update the latest known gs version
       LATEST_GS_VERSION=$GS_VERSION
     fi
   fi
 done
 
-# update master branch if there is a new version
+# update master branch if there is a new 'latest/stable' version
 if [[ -z "$LATEST_GS_VERSION" ]]; then
-  echo "No new geoserver version available!"
+  echo "No new 'latest/stable' geoserver version available!"
 else
-  git checkout master > /dev/null 2>&1
+  git checkout master #  > /dev/null 2>&1
   sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$LATEST_GS_VERSION;g" ../Dockerfile
   git commit --allow-empty -m "Update to latest version $LATEST_GS_VERSION" ../Dockerfile
   git push upstream master
