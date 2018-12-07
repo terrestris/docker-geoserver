@@ -1,5 +1,5 @@
 # Use a minimal tomcat image as parent
-FROM terrestris/tomcat:latest
+FROM terrestris/tomcat:8.5.35
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
