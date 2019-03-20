@@ -25,6 +25,7 @@ RUN apk -U upgrade --update && \
     apk add curl && \
     apk add openssl && \
     apk add libressl2.7-libcrypto && \
+    apk add nss && \
     apk add zip && \
     apk add \
     --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
