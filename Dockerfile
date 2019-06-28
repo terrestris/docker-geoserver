@@ -3,7 +3,7 @@ FROM terrestris/tomcat:8.5.37
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG GS_VERSION=2.15.1
+ARG GS_VERSION=2.15.2
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
 
