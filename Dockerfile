@@ -1,9 +1,8 @@
-# Use a minimal tomcat image as parent
-FROM terrestris/tomcat:8.5.37
+FROM tomcat:9-jdk8
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG GS_VERSION=2.17.0
+ARG GS_VERSION=2.16.2
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
 
@@ -21,16 +20,8 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS -Dfile.encoding=UTF-8 -D-XX:SoftRefLRUPolic
 WORKDIR /tmp
 
 # init
-RUN apk -U upgrade --update && \
-    apk add curl && \
-    apk add openssl && \
-    apk add libressl2.7-libcrypto && \
-    apk add nss && \
-    apk add zip && \
-    apk add \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-    gdal && \
+RUN apt update && \
+    apt install -y curl openssl zip gdal-bin && \
     rm -rf $CATALINA_HOME/webapps/*
 
 # install geoserver
@@ -81,8 +72,8 @@ RUN curl -jkSL -o $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marl
     curl -jkSL -o $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
-RUN apk del curl && \
-    rm -rf /tmp/* /var/cache/apk/*
+RUN apt remove -y curl && \
+    rm -rf /tmp/* /var/cache/apt/*
 
 COPY startup.sh /opt/startup.sh
 
