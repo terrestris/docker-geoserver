@@ -74,3 +74,9 @@ RUN curl -jkSL -o $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marl
 # cleanup
 RUN apt remove -y curl && \
     rm -rf /tmp/* /var/cache/apt/*
+
+COPY startup.sh /opt/startup.sh
+
+ENTRYPOINT /opt/startup.sh
+
+WORKDIR /opt
