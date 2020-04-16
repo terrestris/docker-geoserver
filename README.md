@@ -2,11 +2,11 @@
 
 This Dockerfile can be used to create images for all geoserver versions since 2.5.
 
-Based on [terrestris/tomcat](https://github.com/terrestris/docker-tomcat):
+Based on [tomcat:9-jdk8](https://hub.docker.com/_/tomcat):
 
-* Alpine Linux
+* Debian based Linux
 * OpenJDK 8
-* Tomcat 8.5
+* Tomcat 9
 * GeoServer
   * Native Java advanced imaging (JAI) is installed
   * (but) [JAI-EXT](http://docs.geoserver.org/stable/en/user/configuration/image_processing/index.html#jai-ext) is enabled by default
