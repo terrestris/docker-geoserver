@@ -2,7 +2,7 @@ FROM tomcat:9-jdk8
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG GS_VERSION=2.17.2
+ARG GS_VERSION=2.18.0
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
 
