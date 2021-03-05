@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+  geoserver:
+    image: terrestris/geoserver
+    container_name: geoserver
+    restart: always
+    ports:
+      - 80:8080
+    volumes:
+      - ./geoserver_data/:/opt/geoserver_data/
+    networks:
+      - geoserver
+
+  postgis:
+    image: postgis/postgis
+    container_name: postgis
+    restart: always
+    environment:
+      POSTGRES_DB: postgis
+      POSTGRES_USER: postgis
+      POSTGRES_PASSWORD: postgis
+    ports:
+      - 5432:5432
+    volumes:
+      - postgisdata:/var/lib/postgresql/data
+    networks:
+      - geoserver
+
+volumes:
+  postgisdata:
+
+networks:
+  geoserver:
