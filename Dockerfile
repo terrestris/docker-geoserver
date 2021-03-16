@@ -54,6 +54,7 @@ COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
 
 # Enable CORS
 RUN sed -i '\:</web-app>:i\
+    \n\
     <filter>\n\
       <filter-name>CorsFilter</filter-name>\n\
       <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>\n\
