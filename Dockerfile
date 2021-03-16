@@ -54,14 +54,14 @@ COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
 
 # Enable CORS
 RUN sed -i '\:</web-app>:i\
-    <filter>\
-      <filter-name>CorsFilter</filter-name>\
-      <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>\
-    </filter>\
-    <filter-mapping>\
-      <filter-name>CorsFilter</filter-name>\
-      <url-pattern>/*</url-pattern>\
-    </filter-mapping>' $CATALINA_HOME/webapps/geoserver/WEB-INF/web.xml
+    <filter>\n\
+      <filter-name>CorsFilter</filter-name>\n\
+      <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>\n\
+    </filter>\n\
+    <filter-mapping>\n\
+      <filter-name>CorsFilter</filter-name>\n\
+      <url-pattern>/*</url-pattern>\n\
+    </filter-mapping>\n' $CATALINA_HOME/webapps/geoserver/WEB-INF/web.xml
 
 # install java advanced imaging
 RUN wget https://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
