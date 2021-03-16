@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
   geoserver:
+    build: .
     image: terrestris/geoserver
     container_name: geoserver
     restart: always
