@@ -30,7 +30,7 @@ jobs:
           flavor: |
             latest=auto
       - name: Generate docker tag
-        run: echo '::set-output name=docker-tag::$(echo ${{ steps.meta.outputs.tags }} | sed 's/^terrestris\/geoserver:v/terrestris\/geoserver:/')'
+        run: echo '::set-output name=docker-tag::$(echo ${{ steps.meta.outputs.tags }} | sed 's|^terrestris/geoserver:v|terrestris/geoserver:|')'
         id: generate-docker-tag
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
