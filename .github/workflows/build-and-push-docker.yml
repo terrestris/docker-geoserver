@@ -29,6 +29,9 @@ jobs:
             type=ref,event=branch
           flavor: |
             latest=auto
+      - name: Generate docker tag
+        run: echo '::set-output name=docker-tag::$(echo ${{ steps.meta.outputs.tags }} | sed 's/^v//')'
+        id: generate-docker-tag
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -40,11 +43,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
 #      - name: Build and push
 #        id: docker_build
-#        uses: docker/build-push-action@v2
+#        uses: docker/build-push-action@v5
 #        with:
 #          push: true
 #          tags: ${{ steps.meta.outputs.tags }}
 #          context: .
-#          file: docker/Dockerfile
+#          file: Dockerfile
       - name: Image digest
-        run: echo ${{ steps.meta.outputs.json }}
+        run: echo ${{ steps.generate-docker-tag.outputs.docker-tag }}
