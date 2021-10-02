@@ -41,13 +41,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
-#      - name: Build and push
-#        id: docker_build
-#        uses: docker/build-push-action@v5
-#        with:
-#          push: true
-#          tags: ${{ steps.meta.outputs.tags }}
-#          context: .
-#          file: Dockerfile
-      - name: Image digest
-        run: echo ${{ steps.generate-docker-tag.outputs.docker-tag }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ steps.generate-docker-tag.outputs.docker-tag }}
+          context: .
+          file: Dockerfile
