@@ -21,8 +21,6 @@ jobs:
           images: terrestris/geoserver
           tags: |
             type=ref,event=branch
-          flavor: |
-            latest=auto
       - name: Generate docker tag 😝
         run: echo "docker_tag=$(echo ${{ steps.meta.outputs.tags }} | sed 's|^terrestris/geoserver:v|terrestris/geoserver:|')" >> $GITHUB_ENV
         id: generate-docker-tag
