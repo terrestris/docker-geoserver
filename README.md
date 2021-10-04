@@ -2,7 +2,7 @@
 
 This Dockerfile can be used to create images for all geoserver versions since 2.5.
 
-Based on [tomcat:9-jdk8](https://hub.docker.com/_/tomcat):
+Based on [tomcat:9-jdk11](https://hub.docker.com/_/tomcat):
 
 * Debian based Linux
 * OpenJDK 11 (since October 2021)
