@@ -1,4 +1,4 @@
-FROM tomcat:9-jdk8
+FROM tomcat:9-jdk11
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
@@ -15,7 +15,7 @@ ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
 ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g"
 
 # see http://docs.geoserver.org/stable/en/user/production/container.html
-ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS -Dfile.encoding=UTF-8 -D-XX:SoftRefLRUPolicyMSPerMB=36000 -Xbootclasspath/a:$CATALINA_HOME/lib/marlin.jar -Xbootclasspath/p:$CATALINA_HOME/lib/marlin-sun-java2d.jar -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine -Dorg.geotools.coverage.jaiext.enabled=true"
+ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS -Dfile.encoding=UTF-8 -D-XX:SoftRefLRUPolicyMSPerMB=36000 -Xbootclasspath/a:$CATALINA_HOME/lib/marlin.jar -Xbootclasspath/a:$CATALINA_HOME/lib/marlin-sun-java2d.jar -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine -Dorg.geotools.coverage.jaiext.enabled=true"
 
 WORKDIR /tmp
 
@@ -57,10 +57,10 @@ RUN wget https://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-
     wget https://download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-amd64.tar.gz && \
     gunzip -c jai-1_1_3-lib-linux-amd64.tar.gz | tar xf - && \
     gunzip -c jai_imageio-1_1-lib-linux-amd64.tar.gz | tar xf - && \
-    mv /tmp/jai-1_1_3/lib/*.jar $JAVA_HOME/jre/lib/ext/ && \
-    mv /tmp/jai-1_1_3/lib/*.so $JAVA_HOME/jre/lib/amd64/ && \
-    mv /tmp/jai_imageio-1_1/lib/*.jar $JAVA_HOME/jre/lib/ext/ && \
-    mv /tmp/jai_imageio-1_1/lib/*.so $JAVA_HOME/jre/lib/amd64/
+    mv /tmp/jai-1_1_3/lib/*.jar $CATALINA_HOME/lib/ && \
+    mv /tmp/jai-1_1_3/lib/*.so $JAVA_HOME/lib/ && \
+    mv /tmp/jai_imageio-1_1/lib/*.jar $CATALINA_HOME/lib/ && \
+    mv /tmp/jai_imageio-1_1/lib/*.so $JAVA_HOME/lib/
 
 # uninstall JAI default installation from geoserver to avoid classpath conflicts
 # see http://docs.geoserver.org/latest/en/user/production/java.html#install-native-jai-and-imageio-extensions
