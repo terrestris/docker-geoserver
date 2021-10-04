@@ -5,6 +5,7 @@ FROM tomcat:9-jdk11
 ARG GS_VERSION=2.19.2
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
+ARG ADDITIONAL_FONTS_PATH=./additional_fonts/
 
 # Environment variables
 ENV GEOSERVER_VERSION=$GS_VERSION
@@ -53,6 +54,7 @@ RUN curl -jkSL -o ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar http
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
+COPY $ADDITIONAL_FONTS_PATH /usr/share/fonts/truetype/
 
 # install java advanced imaging
 RUN wget https://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
