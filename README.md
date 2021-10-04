@@ -62,6 +62,14 @@ If you want to add geoserver extensions/libs by using a mount, you can add somet
 --mount src="/dir/with/libs/on/host",target=/opt/additional_libs,type=bind
 ```
 
+## How to add additional fonts to the docker image (e.g. for SLD styling)?
+
+If you want to add custom fonts (the base image only contains 26 fonts) by using a mount, you can add something like
+
+```
+--mount src="/dir/with/fonts/on/host",target=/opt/additional_fonts,type=bind
+```
+
 to your `docker run` command.
 
 **Note:** Do not change the target value!
