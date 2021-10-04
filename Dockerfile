@@ -1,4 +1,4 @@
-FROM tomcat:9-jdk11
+FROM tomcat:9-jre11-openjdk-slim
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
@@ -21,7 +21,7 @@ WORKDIR /tmp
 
 # init
 RUN apt update && \
-    apt install -y curl openssl zip gdal-bin && \
+    apt install -y curl openssl zip gdal-bin wget && \
     rm -rf $CATALINA_HOME/webapps/*
 
 # install geoserver
