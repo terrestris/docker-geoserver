@@ -10,6 +10,7 @@ ARG CORS_ENABLED=false
 ARG CORS_ALLOWED_ORIGINS=*
 ARG CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,HEAD,OPTIONS
 ARG CORS_ALLOWED_HEADERS=*
+ARG STABLE_PLUGIN_URL=https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions
 
 # Environment variables
 ENV GEOSERVER_VERSION=$GS_VERSION
@@ -22,6 +23,12 @@ ENV CORS_ENABLED=$CORS_ENABLED
 ENV CORS_ALLOWED_ORIGINS=$CORS_ALLOWED_ORIGINS
 ENV CORS_ALLOWED_METHODS=$CORS_ALLOWED_METHODS
 ENV CORS_ALLOWED_HEADERS=$CORS_ALLOWED_HEADERS
+ENV DEBIAN_FRONTEND=noninteractive
+ENV INSTALL_EXTENSIONS=false
+ENV STABLE_EXTENSIONS=''
+ENV STABLE_PLUGIN_URL=$STABLE_PLUGIN_URL
+ENV ADDITIONAL_LIBS_DIR=/opt/additional_libs/
+ENV ADDITIONAL_FONTS_DIR=/opt/additional_fonts/
 
 # see http://docs.geoserver.org/stable/en/user/production/container.html
 ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
@@ -93,10 +100,11 @@ RUN curl -jkSL -o $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marl
     curl -jkSL -o $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
-RUN apt remove -y curl && \
-    rm -rf /tmp/* /var/cache/apt/*
+RUN rm -rf /tmp/* /var/cache/apt/*
 
-COPY startup.sh /opt/startup.sh
+# copy scripts
+COPY *.sh /opt/
+RUN chmod +x /opt/*.sh
 
 ENTRYPOINT /opt/startup.sh
 
