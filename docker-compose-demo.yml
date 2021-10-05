@@ -9,6 +9,8 @@ services:
       - 8080:8080
     environment:
       - EXTRA_JAVA_OPTS=-Xms512m -Xmx1g
+      - INSTALL_EXTENSIONS=true
+      - STABLE_EXTENSIONS=wps,csw # this will install wps and csw extensions on startup
       - CORS_ENABLED=true
       - CORS_ALLOWED_ORIGINS=*
       - CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,HEAD,OPTIONS

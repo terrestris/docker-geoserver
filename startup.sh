@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ADDITIONAL_LIBS_DIR=/opt/additional_libs/
-ADDITIONAL_FONTS_DIR=/opt/additional_fonts/
+## install GeoServer extensions before starting the tomcat
+/opt/install-extensions.sh
 
 # copy additional geoserver libs before starting the tomcat
 if [ -d "$ADDITIONAL_LIBS_DIR" ]; then
