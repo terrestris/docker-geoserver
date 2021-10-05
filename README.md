@@ -2,15 +2,18 @@
 
 This Dockerfile can be used to create images for all geoserver versions since 2.5.
 
-Based on [tomcat:9-jdk11](https://hub.docker.com/_/tomcat):
+Based on [tomcat:9-jre11-openjdk-slim](https://hub.docker.com/_/tomcat):
 
 * Debian based Linux
-* OpenJDK 11 (since October 2021)
+* OpenJDK 11
 * Tomcat 9
 * GeoServer
   * Native Java advanced imaging (JAI) is installed
-  * (but) [JAI-EXT](http://docs.geoserver.org/stable/en/user/configuration/image_processing/index.html#jai-ext) is enabled by default
+  * [JAI-EXT](http://docs.geoserver.org/stable/en/user/configuration/image_processing/index.html#jai-ext) is enabled by default
   * Marlin renderer
+  * Support of custom fonts (e.g. for SLD styling)
+  * [GeoStyler](https://www.osgeo.org/projects/geostyler/) included
+  * CORS support
 
 **IMPORTANT NOTE:** Please change the default geoserver master password! The default masterpw is located in this file (within the docker container): `/opt/geoserver_data/security/masterpw/default/masterpw`
 
