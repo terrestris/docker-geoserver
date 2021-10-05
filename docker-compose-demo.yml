@@ -9,6 +9,10 @@ services:
       - 8080:8080
     environment:
       - EXTRA_JAVA_OPTS=-Xms512m -Xmx1g
+      - CORS_ENABLED=true
+      - CORS_ALLOWED_ORIGINS=*
+      - CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,HEAD,OPTIONS
+      - CORS_ALLOWED_HEADERS=*
     volumes:
       - ./additional_libs:/opt/additional_libs:Z # by mounting this we can install libs from host on startup
       - ./additional_fonts:/opt/additional_fonts:Z # by mounting this we can install fonts from host on startup
