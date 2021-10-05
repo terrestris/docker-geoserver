@@ -77,3 +77,7 @@ to your `docker run` command.
 ## How to watch geoserver.log from host?
 
 `docker exec -it {CONTAINER_ID} tail -f /opt/geoserver_data/logs/geoserver.log`
+
+## How to use the docker-compose demo?
+
+`docker-compose -f docker-compose-demo.yml up --build`
