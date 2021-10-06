@@ -1,1 +1,3 @@
 *.iml
+postgis/postgresql_data/
+

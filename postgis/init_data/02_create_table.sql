@@ -1,0 +1,27 @@
+CREATE TABLE airports
+(
+  gid serial NOT NULL,
+  ourairports_id integer,
+  ident varchar(16),
+  "type" varchar(32),
+  "name" varchar(255),
+  lat decimal,
+  lon decimal,
+  elevation smallint,
+  continent varchar(2),
+  iso_country varchar(2),
+  iso_region varchar(8),
+  municipality varchar(64),
+  scheduled_service boolean,
+  gps_code varchar(4),
+  iata_code varchar(3),
+  local_code varchar(8),
+  homepage varchar(255),
+  wikipedia varchar(255),
+  keywords text,
+  the_geom geometry(Point, 4326),
+  CONSTRAINT airports_pkey PRIMARY KEY (gid),
+  CONSTRAINT enforce_dims_the_geom CHECK (st_ndims(the_geom) = 2),
+  CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL),
+  CONSTRAINT enforce_srid_the_geom CHECK (st_srid(the_geom) = 4326)
+);
