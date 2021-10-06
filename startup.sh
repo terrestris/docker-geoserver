@@ -20,10 +20,12 @@ fi
 # configure CORS (inspired by https://github.com/oscarfonts/docker-geoserver)
 # if enabled, this will add the filter definitions
 # to the end of the web.xml
+# (this will only happen if our filter has not yet been added before)
 if [ "${CORS_ENABLED}" = "true" ]; then
+  if ! grep -q DockerGeoServerCorsFilter "$CATALINA_HOME/webapps/geoserver/WEB-INF/web.xml"; then
     sed -i "\:</web-app>:i\\
     <filter>\n\
-      <filter-name>CorsFilter</filter-name>\n\
+      <filter-name>DockerGeoServerCorsFilter</filter-name>\n\
       <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>\n\
       <init-param>\n\
           <param-name>cors.allowed.origins</param-name>\n\
@@ -39,9 +41,10 @@ if [ "${CORS_ENABLED}" = "true" ]; then
       </init-param>\n\
     </filter>\n\
     <filter-mapping>\n\
-      <filter-name>CorsFilter</filter-name>\n\
+      <filter-name>DockerGeoServerCorsFilter</filter-name>\n\
       <url-pattern>/*</url-pattern>\n\
     </filter-mapping>" "$CATALINA_HOME/webapps/geoserver/WEB-INF/web.xml";
+  fi
 fi
 
 # start the tomcat
