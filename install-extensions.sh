@@ -28,9 +28,10 @@ if [ "$INSTALL_EXTENSIONS" = "true" ]; then
   echo "Finished download of extensions"
 fi
 
-# Install all extensions that are available in the additional lib dir now
+# Install the extensions
 echo "Starting installation of extensions"
-for ADDITIONAL_LIB in ${ADDITIONAL_LIBS_DIR}*; do
+for EXTENSION in $(echo "${STABLE_EXTENSIONS}" | tr ',' ' '); do
+  ADDITIONAL_LIB=${ADDITIONAL_LIBS_DIR}geoserver-${GEOSERVER_VERSION}-${EXTENSION}-plugin.zip
   [ -e "$ADDITIONAL_LIB" ] || continue
 
   if [[ $ADDITIONAL_LIB == *.zip ]]; then

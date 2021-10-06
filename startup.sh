@@ -4,12 +4,16 @@
 /opt/install-extensions.sh
 
 # copy additional geoserver libs before starting the tomcat
-if [ -d "$ADDITIONAL_LIBS_DIR" ]; then
+# we also count whether at least one file with the extensions exists
+count=`ls -1 *.jar 2>/dev/null | wc -l`
+if [ -d "$ADDITIONAL_LIBS_DIR" ] && [ $count != 0 ]; then
     cp $ADDITIONAL_LIBS_DIR/*.jar $CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
 fi
 
 # copy additional fonts before starting the tomcat
-if [ -d "$ADDITIONAL_FONTS_DIR" ]; then
+# we also count whether at least one file with the extensions exists
+count=`ls -1 *.ttf 2>/dev/null | wc -l`
+if [ -d "$ADDITIONAL_FONTS_DIR" ] && [ $count != 0 ]; then
     cp $ADDITIONAL_FONTS_DIR/*.ttf /usr/share/fonts/truetype/
 fi
 
