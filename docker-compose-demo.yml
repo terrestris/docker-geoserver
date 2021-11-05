@@ -22,6 +22,7 @@ services:
       - ./resources/datastore/datastore.xml:/opt/geoserver_data/workspaces/terrestris/postgis/datastore.xml:Z # works with default datadir of this image only
       - ./resources/styles/airfields.xml:/opt/geoserver_data/styles/airfields.xml:Z
       - ./resources/styles/airfields.sld:/opt/geoserver_data/styles/airfields.sld:Z
+      - ./resources/styles/svg:/opt/geoserver_data/styles/svg:Z
       - ./resources/layers/airfields/featuretype.xml:/opt/geoserver_data/workspaces/terrestris/postgis/airfields/featuretype.xml:Z
       - ./resources/layers/airfields/layer.xml:/opt/geoserver_data/workspaces/terrestris/postgis/airfields/layer.xml:Z
   postgis:

@@ -16,13 +16,11 @@
           </Filter>
           <PointSymbolizer>
             <Graphic>
-              <Mark>
-                <WellKnownName>star</WellKnownName>
-                <Fill>
-                  <CssParameter name="fill">#cc0003</CssParameter>
-                </Fill>
-              </Mark>
-              <Size>12</Size>
+              <ExternalGraphic>
+                <OnlineResource xlink:type="simple" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="svg/small_airport.svg"/>
+                <Format>image/svg+xml</Format>
+              </ExternalGraphic>
+              <Size>20</Size>
             </Graphic>
           </PointSymbolizer>
         </Rule>
