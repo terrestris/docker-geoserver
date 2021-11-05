@@ -1,4 +1,4 @@
-copy airports(
+copy airfields(
 	ourairports_id,
 	ident,
 	"type",

@@ -1,4 +1,4 @@
-CREATE TABLE airports
+CREATE TABLE airfields
 (
   gid serial NOT NULL,
   ourairports_id integer,
@@ -20,7 +20,7 @@ CREATE TABLE airports
   wikipedia varchar(255),
   keywords text,
   the_geom geometry(Point, 4326),
-  CONSTRAINT airports_pkey PRIMARY KEY (gid),
+  CONSTRAINT airfields_pkey PRIMARY KEY (gid),
   CONSTRAINT enforce_dims_the_geom CHECK (st_ndims(the_geom) = 2),
   CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL),
   CONSTRAINT enforce_srid_the_geom CHECK (st_srid(the_geom) = 4326)

@@ -4,7 +4,7 @@ services:
     build:
       context: .
       args:
-        - GS_VERSION=2.19.2
+        - GS_VERSION=2.20.0
     ports:
       - 8080:8080
     environment:
@@ -18,6 +18,12 @@ services:
     volumes:
       - ./additional_libs:/opt/additional_libs:Z # by mounting this we can install libs from host on startup
       - ./additional_fonts:/opt/additional_fonts:Z # by mounting this we can install fonts from host on startup
+      - ./resources:/opt/resources:Z
+      - ./resources/datastore/datastore.xml:/opt/geoserver_data/workspaces/terrestris/postgis/datastore.xml:Z # works with default datadir of this image only
+      - ./resources/styles/airfields.xml:/opt/geoserver_data/styles/airfields.xml:Z
+      - ./resources/styles/airfields.sld:/opt/geoserver_data/styles/airfields.sld:Z
+      - ./resources/layers/airfields/featuretype.xml:/opt/geoserver_data/workspaces/terrestris/postgis/airfields/featuretype.xml:Z
+      - ./resources/layers/airfields/layer.xml:/opt/geoserver_data/workspaces/terrestris/postgis/airfields/layer.xml:Z
   postgis:
     image: postgis/postgis:14-3.1-alpine
     ports:
@@ -27,7 +33,7 @@ services:
       POSTGRES_PASSWORD: geoserver
       # will try to download the latest airports.csv, but may fail if the attribute set of the csv has changed (which sometimes happens)
       # set this to false and the shipped airports.csv (mounted below) will be used instead
-      TRY_TO_USE_LATEST_AIRPORTS: true
+      TRY_TO_USE_LATEST_AIRPORTS: "true"
     volumes:
       - ./postgis/postgresql_data:/var/lib/postgresql/data:Z
       - ./postgis/init_data/01_download_airports.sh:/docker-entrypoint-initdb.d/11_download_airports.sh # in container we need to be > 10 as in 10 postgis is installed
