@@ -51,18 +51,22 @@ for GS_VERSION in $GITHUB_GS_VERSIONS; do
     done
 
     if [ "${GS_VERSION_EXISTS_ON_DOCKER}" = false ] ; then
-      echo "v${GS_VERSION} is not yet on docker! A new branch will be created now."
-      git checkout master > /dev/null 2>&1
-      # create a new branch for the new gs version
-      if (git rev-parse --verify "v$GS_VERSION" > /dev/null 2>&1); then
-          # delete the local branch if it should exist for some reason
-          # (this should not really happen)
-          git branch -D "v$GS_VERSION" > /dev/null 2>&1
+      if (http://downloads.sourceforge.net/project/geoserver/GeoServer/$GS_VERSION/geoserver-$GS_VERSION-war.zip); then
+        echo "v${GS_VERSION} is not yet on docker! A new branch will be created now."
+        git checkout master > /dev/null 2>&1
+        # create a new branch for the new gs version
+        if (git rev-parse --verify "v$GS_VERSION" > /dev/null 2>&1); then
+            # delete the local branch if it should exist for some reason
+            # (this should not really happen)
+            git branch -D "v$GS_VERSION" > /dev/null 2>&1
+        fi
+        git checkout -b "v$GS_VERSION" > /dev/null 2>&1
+        sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$GS_VERSION;g" ../Dockerfile
+        git commit --allow-empty -m "Update to version $GS_VERSION" ../Dockerfile > /dev/null 2>&1
+        git push --force upstream "v$GS_VERSION"
+      else
+        echo "v${GS_VERSION} is not yet available on SourceForge! Skipping docker build for now."
       fi
-      git checkout -b "v$GS_VERSION" > /dev/null 2>&1
-      sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$GS_VERSION;g" ../Dockerfile
-      git commit --allow-empty -m "Update to version $GS_VERSION" ../Dockerfile > /dev/null 2>&1
-      git push --force upstream "v$GS_VERSION"
     fi
 
     if version_gt $GS_VERSION $LATEST_DOCKER_GS_VERSION; then
