@@ -17,7 +17,19 @@ git pull upstream master > /dev/null 2>&1
 # get the current GS version that is used in the docker file
 LATEST_DOCKER_GS_VERSION=$(cat ../Dockerfile | grep "ARG GS_VERSION" | cut -d'=' -f2)
 
-DOCKER_GS_VERSIONS=$(curl -s "https://api.github.com/repos/terrestris/docker-geoserver/branches?per_page=100" | jq '.[].name' | sed -e 's/"//g' | tac)
+DOCKER_VERSION_PAGE=1
+
+DOCKER_GS_VERSIONS=$(curl -s "https://api.github.com/repos/terrestris/docker-geoserver/branches?per_page=100&page=${DOCKER_VERSION_PAGE}" | jq '.[].name' | sed -e 's/"//g' | tac)
+DOCKER_GS_ALL_VERSIONS=
+
+while ( test ! -z "$DOCKER_GS_VERSIONS" )
+do
+  DOCKER_GS_ALL_VERSIONS="$DOCKER_GS_ALL_VERSIONS $DOCKER_GS_VERSIONS"
+  DOCKER_VERSION_PAGE=$((DOCKER_VERSION_PAGE+1))
+  DOCKER_GS_VERSIONS=$(curl -s "https://api.github.com/repos/terrestris/docker-geoserver/branches?per_page=100&page=${DOCKER_VERSION_PAGE}" | jq '.[].name' | sed -e 's/"//g' | tac)
+done
+
+echo $DOCKER_GS_ALL_VERSIONS
 
 # get the last 100 tags/versions of geoserver on github (ordered from old to new)
 GITHUB_GS_VERSIONS=$(curl -s "https://api.github.com/repos/geoserver/geoserver/tags?per_page=100" | jq '.[].name' | sed -e 's/"//g' | tac)
@@ -31,7 +43,7 @@ for GS_VERSION in $GITHUB_GS_VERSIONS; do
     GS_VERSION_EXISTS_ON_DOCKER=false
 
     # check if our GS_VERSION is already present on docker
-    for DOCKER_GS_VERSION in $DOCKER_GS_VERSIONS; do
+    for DOCKER_GS_VERSION in $DOCKER_GS_ALL_VERSIONS; do
       if [ "${DOCKER_GS_VERSION}" = "v${GS_VERSION}" ]; then
         GS_VERSION_EXISTS_ON_DOCKER=true
         break
