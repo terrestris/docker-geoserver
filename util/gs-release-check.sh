@@ -51,7 +51,7 @@ for GS_VERSION in $GITHUB_GS_VERSIONS; do
     done
 
     if [ "${GS_VERSION_EXISTS_ON_DOCKER}" = false ] ; then
-      if (http://downloads.sourceforge.net/project/geoserver/GeoServer/$GS_VERSION/geoserver-$GS_VERSION-war.zip); then
+      if (curl --head --silent --fail http://downloads.sourceforge.net/project/geoserver/GeoServer/$GS_VERSION/geoserver-$GS_VERSION-war.zip); then
         echo "v${GS_VERSION} is not yet on docker! A new branch will be created now."
         git checkout master > /dev/null 2>&1
         # create a new branch for the new gs version
