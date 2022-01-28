@@ -46,7 +46,7 @@ WORKDIR /tmp
 
 # init
 RUN apt update && \
-    apt install -y curl openssl zip gdal-bin wget && \
+    apt install -y curl openssl zip gdal-bin libgdal-grass wget && \
     rm -rf $CATALINA_HOME/webapps/*
 
 # install geoserver
