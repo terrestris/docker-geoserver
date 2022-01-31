@@ -5,7 +5,7 @@
 
 # copy additional geoserver libs before starting the tomcat
 # we also count whether at least one file with the extensions exists
-count=`ls -1 *.jar 2>/dev/null | wc -l`
+count=`ls -1 $ADDITIONAL_LIBS_DIR/*.jar 2>/dev/null | wc -l`
 if [ -d "$ADDITIONAL_LIBS_DIR" ] && [ $count != 0 ]; then
     cp $ADDITIONAL_LIBS_DIR/*.jar $CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
 fi

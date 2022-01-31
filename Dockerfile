@@ -46,8 +46,12 @@ WORKDIR /tmp
 
 # init
 RUN apt update && \
-    apt install -y curl openssl zip gdal-bin wget && \
+    apt install -y curl openssl zip gdal-bin libgdal-grass wget && \
     rm -rf $CATALINA_HOME/webapps/*
+
+RUN curl -q -o /tmp/jni.deb https://nexus.terrestris.de/repository/raw-public/debian/bullseye/libgdal-java_3.2.2-terrestris_amd64.deb
+RUN dpkg -i /tmp/jni.deb
+RUN rm /tmp/jni.deb
 
 # install geoserver
 RUN curl -jkSL -o /tmp/geoserver.zip http://downloads.sourceforge.net/project/geoserver/GeoServer/$GEOSERVER_VERSION/geoserver-$GEOSERVER_VERSION-war.zip && \
