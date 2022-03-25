@@ -1,7 +1,8 @@
-FROM tomcat:9-jre11-openjdk-slim
+FROM ubuntu:22.04
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
+ARG TOMCAT_VERSION=9.0.60
 ARG GS_VERSION=2.20.3
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
@@ -13,12 +14,14 @@ ARG CORS_ALLOWED_HEADERS=*
 ARG STABLE_PLUGIN_URL=https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions
 
 # Environment variables
+ENV CATALINA_HOME=/opt/apache-tomcat-${TOMCAT_VERSION}
+ENV GDAL_GRASS_VERSION=3.3.3
 ENV GEOSERVER_VERSION=$GS_VERSION
 ENV MARLIN_TAG=0_9_4_3
 ENV MARLIN_VERSION=0.9.4.3
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
-ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g"
+ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass78/lib/"
 ENV CORS_ENABLED=$CORS_ENABLED
 ENV CORS_ALLOWED_ORIGINS=$CORS_ALLOWED_ORIGINS
 ENV CORS_ALLOWED_METHODS=$CORS_ALLOWED_METHODS
@@ -42,19 +45,41 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
     -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine \
     -Dorg.geotools.coverage.jaiext.enabled=true"
 
-WORKDIR /tmp
-
 # init
-RUN apt update && \
-    apt install -y curl openssl zip gdal-bin libgdal-grass wget && \
+RUN apt update && apt -y upgrade && \
+    apt install -y openssl zip gdal-bin wget openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
 
-RUN curl -q -o /tmp/jni.deb https://nexus.terrestris.de/repository/raw-public/debian/bullseye/libgdal-java_3.2.2-terrestris_amd64.deb
-RUN dpkg -i /tmp/jni.deb
-RUN rm /tmp/jni.deb
+RUN wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb
+RUN dpkg -i libgdal-java_1.0_all.deb
+RUN rm libgdal-java_1.0_all.deb
+
+WORKDIR /tmp
+RUN wget -q --no-check-certificate https://github.com/OSGeo/gdal/releases/download/v${GDAL_GRASS_VERSION}/gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
+RUN tar xf gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
+RUN rm gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
+RUN echo /usr/lib/grass78/lib > /etc/ld.so.conf.d/grass.conf
+WORKDIR /tmp/gdal-grass-${GDAL_GRASS_VERSION}
+RUN ./configure \
+ --prefix=/usr/local \
+ --with-postgres-includes=/usr/include/postgresql \
+ --with-gdal=/usr/bin/gdal-config \
+ --with-grass=/usr/lib/grass78/ \
+ --with-autoload="/usr/lib/gdalplugins/" \
+ --with-ld-shared="g++ -shared"
+
+RUN make -j2 && checkinstall && ldconfig
+
+WORKDIR /opt/
+RUN rm -rf /tmp/gdal-grass-${GDAL_GRASS_VERSION}
+RUN wget -q https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
+RUN tar xf apache-tomcat-${TOMCAT_VERSION}.tar.gz
+RUN rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
+
+WORKDIR /tmp
 
 # install geoserver
-RUN curl -jkSL -o /tmp/geoserver.zip http://downloads.sourceforge.net/project/geoserver/GeoServer/$GEOSERVER_VERSION/geoserver-$GEOSERVER_VERSION-war.zip && \
+RUN wget -q -O /tmp/geoserver.zip http://downloads.sourceforge.net/project/geoserver/GeoServer/$GEOSERVER_VERSION/geoserver-$GEOSERVER_VERSION-war.zip && \
     unzip geoserver.zip geoserver.war -d $CATALINA_HOME/webapps && \
     mkdir -p $CATALINA_HOME/webapps/geoserver && \
     unzip -q $CATALINA_HOME/webapps/geoserver.war -d $CATALINA_HOME/webapps/geoserver && \
@@ -78,15 +103,15 @@ RUN cd .. && rm -rf tmp_extract
 
 WORKDIR /tmp
 
-RUN curl -jkSL -o ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar
+RUN wget -q -O ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
 COPY $ADDITIONAL_FONTS_PATH /usr/share/fonts/truetype/
 
 # install java advanced imaging
-RUN wget https://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
-    wget https://download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-amd64.tar.gz && \
+RUN wget -q https://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
+    wget -q https://download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-amd64.tar.gz && \
     gunzip -c jai-1_1_3-lib-linux-amd64.tar.gz | tar xf - && \
     gunzip -c jai_imageio-1_1-lib-linux-amd64.tar.gz | tar xf - && \
     mv /tmp/jai-1_1_3/lib/*.jar $CATALINA_HOME/lib/ && \
@@ -100,8 +125,8 @@ WORKDIR $GEOSERVER_LIB_DIR
 RUN rm jai_core-*jar jai_imageio-*.jar jai_codec-*.jar
 
 # install marlin renderer
-RUN curl -jkSL -o $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe.jar && \
-    curl -jkSL -o $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
+RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe.jar && \
+    wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
 RUN rm -rf /tmp/* /var/cache/apt/*
