@@ -1,0 +1,20 @@
+copy airfields(
+	ourairports_id,
+	ident,
+	"type",
+	"name",
+	lat,
+	lon,
+	elevation,
+	continent,
+	iso_country,
+	iso_region,
+	municipality,
+	scheduled_service,
+	gps_code,
+	iata_code,
+	local_code,
+	homepage,
+	wikipedia,
+	keywords
+) FROM '/var/lib/postgresql/airports.csv' DELIMITERS ',' CSV HEADER;

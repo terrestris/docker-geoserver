@@ -1,0 +1,17 @@
+<layer>
+  <name>airfields</name>
+  <id>LayerInfoImpl--6dfd3d52:17cf0b921fb:-7ffc</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-61e41c97:17cf0b56529:-8000</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--6dfd3d52:17cf0b921fb:-7ffd</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2021-11-05 15:31:57.838 UTC</dateCreated>
+  <dateModified>2021-11-05 15:32:08.659 UTC</dateModified>
+</layer>
