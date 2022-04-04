@@ -17,8 +17,8 @@ ARG STABLE_PLUGIN_URL=https://sourceforge.net/projects/geoserver/files/GeoServer
 ENV CATALINA_HOME=/opt/apache-tomcat-${TOMCAT_VERSION}
 ENV GDAL_GRASS_VERSION=3.3.3
 ENV GEOSERVER_VERSION=$GS_VERSION
-ENV MARLIN_TAG=0_9_4_3
-ENV MARLIN_VERSION=0.9.4.3
+ENV MARLIN_TAG=0_9_4_5
+ENV MARLIN_VERSION=0.9.4.5
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
 ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass78/lib/"
