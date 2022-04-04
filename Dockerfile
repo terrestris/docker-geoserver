@@ -102,7 +102,8 @@ RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar *
 RUN cd .. && rm -rf tmp_extract
 
 WORKDIR /tmp
-RUN echo ${GEOSERVER_VERSION} > /tmp/version.txt; echo "2.15.5" >> /tmp/version.txt; if(test $(sort -V /tmp/version.txt|head -n 1) != "2.15.5"); then echo "Skipping installation of geostyler due to version incompatibility."; else wget -q -O ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar; fi
+# use fake version 2.15.6 to avoid build error
+RUN echo ${GEOSERVER_VERSION} > /tmp/version.txt; echo "2.15.6" >> /tmp/version.txt; if(test $(sort -V /tmp/version.txt|head -n 1) != "2.15.6"); then echo "Skipping installation of geostyler due to version incompatibility."; else wget -q -O ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar; fi
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
