@@ -47,7 +47,7 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 
 # init
 RUN apt update && apt -y upgrade && \
-    apt install -y openssl zip gdal-bin wget openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
+    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
 
 RUN wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb
