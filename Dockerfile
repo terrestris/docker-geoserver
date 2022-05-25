@@ -149,7 +149,9 @@ RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-
     wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$(echo "$MARLIN_VERSION" | sed "s/\./_/g")/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
-RUN rm -rf /tmp/* /var/cache/apt/*
+RUN apt purge -y maven make g++ zip wget curl checkinstall && \
+    apt autoremove --purge -y && \
+    rm -rf /tmp/* /var/cache/apt/*
 
 # copy scripts
 COPY *.sh /opt/
