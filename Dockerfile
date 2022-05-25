@@ -4,7 +4,7 @@ FROM ubuntu:22.04
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG TOMCAT_VERSION=9.0.63
 ARG GS_VERSION=2.21.0
-ARG GDAL_GRASS_VERSION=3.3.3
+ARG GDAL_GRASS_VERSION=1.0.0
 ARG MARLIN_VERSION=0.9.4.5
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
@@ -56,7 +56,7 @@ RUN dpkg -i libgdal-java_1.0_all.deb
 RUN rm libgdal-java_1.0_all.deb
 
 WORKDIR /tmp
-RUN wget -q --no-check-certificate https://github.com/OSGeo/gdal/releases/download/v${GDAL_GRASS_VERSION}/gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
+RUN wget -q --no-check-certificate --content-disposition https://github.com/OSGeo/gdal-grass/archive/refs/tags/${GDAL_GRASS_VERSION}.tar.gz
 RUN tar xf gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
 RUN rm gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
 RUN echo /usr/lib/grass78/lib > /etc/ld.so.conf.d/grass.conf
