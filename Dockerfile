@@ -110,7 +110,7 @@ RUN echo ${GEOSERVER_VERSION} > /tmp/version.txt; echo "2.15.6" >> /tmp/version.
     else \
         if ! (curl --head --silent --fail https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar > /dev/null); then \
             echo "GeoStyler extension not available in OSGeo repo for GeoServer version ${GEOSERVER_VERSION}! Trying to build on sources now." ; \
-            git clone --depth 1 --no-checkout --branch ${GEOSERVER_VERSION}  https://github.com/geoserver/geoserver.git ; \
+            git clone --depth 1 --no-checkout --branch ${GEOSERVER_VERSION} https://github.com/geoserver/geoserver.git ; \
             cd geoserver ; \
             # checkout only the sources we need
             git checkout ${GEOSERVER_VERSION} -- src/community/geostyler ; \
