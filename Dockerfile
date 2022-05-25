@@ -2,8 +2,10 @@ FROM ubuntu:22.04
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG TOMCAT_VERSION=9.0.62
+ARG TOMCAT_VERSION=9.0.63
 ARG GS_VERSION=2.21.0
+ARG GDAL_GRASS_VERSION=3.3.3
+ARG MARLIN_VERSION=0.9.4.5
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
 ARG ADDITIONAL_FONTS_PATH=./additional_fonts/
@@ -15,10 +17,9 @@ ARG STABLE_PLUGIN_URL=https://sourceforge.net/projects/geoserver/files/GeoServer
 
 # Environment variables
 ENV CATALINA_HOME=/opt/apache-tomcat-${TOMCAT_VERSION}
-ENV GDAL_GRASS_VERSION=3.3.3
+ENV GDAL_GRASS_VERSION=$GDAL_GRASS_VERSION
 ENV GEOSERVER_VERSION=$GS_VERSION
-ENV MARLIN_TAG=0_9_4_5
-ENV MARLIN_VERSION=0.9.4.5
+ENV MARLIN_VERSION=$MARLIN_VERSION
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
 ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass78/lib/"
@@ -144,8 +145,8 @@ WORKDIR $GEOSERVER_LIB_DIR
 RUN rm jai_core-*jar jai_imageio-*.jar jai_codec-*.jar
 
 # install marlin renderer
-RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe.jar && \
-    wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$MARLIN_TAG/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
+RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$(echo "$MARLIN_VERSION" | sed "s/\./_/g")/marlin-$MARLIN_VERSION-Unsafe.jar && \
+    wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$(echo "$MARLIN_VERSION" | sed "s/\./_/g")/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
 RUN rm -rf /tmp/* /var/cache/apt/*
