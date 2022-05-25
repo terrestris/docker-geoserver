@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <profiles>
+        <profile>
+            <id>terrestris</id>
+            <repositories>
+                <repository>
+                    <id>terrestris-repository</id>
+                    <name>Terrestris Public Maven Repository</name>
+                    <url>https://nexus.terrestris.de/repository/public/</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>terrestris</activeProfile>
+    </activeProfiles>
+</settings>
