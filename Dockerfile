@@ -47,7 +47,7 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 
 # init
 RUN apt update && apt -y upgrade && \
-    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
+    apt install -y maven openssl zip gdal-bin wget curl openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
 
 RUN wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb
@@ -102,8 +102,27 @@ RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar *
 RUN cd .. && rm -rf tmp_extract
 
 WORKDIR /tmp
+COPY ./settings.xml .
 # use fake version 2.15.6 to avoid build error
-RUN echo ${GEOSERVER_VERSION} > /tmp/version.txt; echo "2.15.6" >> /tmp/version.txt; if(test $(sort -V /tmp/version.txt|head -n 1) != "2.15.6"); then echo "Skipping installation of geostyler due to version incompatibility."; else wget -q -O ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar; fi
+RUN echo ${GEOSERVER_VERSION} > /tmp/version.txt; echo "2.15.6" >> /tmp/version.txt; \
+    if(test $(sort -V /tmp/version.txt|head -n 1) != "2.15.6"); then \
+        echo "Skipping installation of GeoStyler due to version incompatibility."; \
+    else \
+        if ! (curl --head --silent --fail https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar > /dev/null); then \
+            echo "GeoStyler extension not available in OSGeo repo for GeoServer version ${GEOSERVER_VERSION}! Trying to build on sources now." ; \
+            git clone --depth 1 --no-checkout --branch ${GEOSERVER_VERSION} https://github.com/geoserver/geoserver.git ; \
+            cd geoserver ; \
+            # checkout only the sources we need
+            git checkout ${GEOSERVER_VERSION} -- src/community/geostyler ; \
+            cd src/community/geostyler ; \
+            echo "Building the GeoStyler extension now. This will take some time. Be patient!" ; \
+            mvn -s "/tmp/settings.xml" -q -B -e -T 2C install ; \
+            cp target/gs-geostyler-${GEOSERVER_VERSION}.jar ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar ; \
+        else \
+            echo "Downloading GeoStyler extension from OSGeo repo now."; \
+            wget -q -O ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar; \
+        fi \
+    fi
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
