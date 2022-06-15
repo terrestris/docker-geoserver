@@ -118,22 +118,28 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 COPY --from=builder /tmp/gdal-grass-1.0.0/gdal-grass_1.0.0-1_amd64.deb /tmp/
 
 # init
-RUN apt update && apt -y upgrade && \
-    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk grass-core && \
-    rm -rf $CATALINA_HOME/webapps/* && apt clean && \
+RUN apt update && \
+    apt -y upgrade && \
+    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk grass-core && \
+    rm -rf $CATALINA_HOME/webapps/* && \
+    apt clean && \
     wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb && \
     dpkg -i libgdal-java_1.0_all.deb && \
     rm libgdal-java_1.0_all.deb && \
     dpkg -i /tmp/gdal-grass_1.0.0-1_amd64.deb && \
     rm /tmp/gdal-grass_1.0.0-1_amd64.deb && \
     rm -rf /var/cache/apt/* && \
+    rm -rf /var/lib/apt/lists/* && \
     echo /usr/lib/grass78/lib > /etc/ld.so.conf.d/grass.conf && \
     ldconfig
 
 WORKDIR /opt/
 RUN wget -q https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
     tar xf apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
-    rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
+    rm apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/ROOT && \
+    rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/docs && \
+    rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/examples
 
 WORKDIR /tmp
 
@@ -157,8 +163,9 @@ RUN cat org/geoserver/web/css/minimalistic.css >> org/geoserver/web/css/geoserve
 COPY ./modifications.js org/geoserver/web/js/modifications.js
 RUN sed -i 's|</wicket:head>|<wicket:link><script type="text/javascript" src="js/modifications.js"></script></wicket:link></wicket:head>|g' org/geoserver/web/GeoServerBasePage.html
 
-RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar *
-RUN cd .. && rm -rf tmp_extract
+RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar * && \
+    cd .. && \
+    rm -rf tmp_extract
 
 WORKDIR /tmp
 COPY ./settings.xml .
@@ -208,7 +215,7 @@ RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-
     wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$(echo "$MARLIN_VERSION" | sed "s/\./_/g")/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
-RUN apt purge -y zip wget && \
+RUN apt purge -y zip unzip wget curl && \
     apt autoremove --purge -y && \
     rm -rf /tmp/*
 
