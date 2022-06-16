@@ -1,8 +1,8 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS builder
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG TOMCAT_VERSION=9.0.63
+ARG TOMCAT_VERSION=9.0.64
 ARG GS_VERSION=2.21.0
 ARG GDAL_GRASS_VERSION=1.0.0
 ARG MARLIN_VERSION=0.9.4.5
@@ -48,12 +48,8 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 
 # init
 RUN apt update && apt -y upgrade && \
-    apt install -y maven openssl zip gdal-bin wget curl openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
+    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
-
-RUN wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb
-RUN dpkg -i libgdal-java_1.0_all.deb
-RUN rm libgdal-java_1.0_all.deb
 
 WORKDIR /tmp
 RUN wget -q --no-check-certificate --content-disposition https://github.com/OSGeo/gdal-grass/archive/refs/tags/${GDAL_GRASS_VERSION}.tar.gz
@@ -71,11 +67,79 @@ RUN ./configure \
 
 RUN make -j2 && checkinstall && ldconfig
 
+FROM ubuntu:22.04
+
+# The GS_VERSION argument could be used like this to overwrite the default:
+# docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
+ARG TOMCAT_VERSION=9.0.64
+ARG GS_VERSION=2.21.0
+ARG GDAL_GRASS_VERSION=1.0.0
+ARG MARLIN_VERSION=0.9.4.5
+ARG GS_DATA_PATH=./geoserver_data/
+ARG ADDITIONAL_LIBS_PATH=./additional_libs/
+ARG ADDITIONAL_FONTS_PATH=./additional_fonts/
+ARG CORS_ENABLED=false
+ARG CORS_ALLOWED_ORIGINS=*
+ARG CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,HEAD,OPTIONS
+ARG CORS_ALLOWED_HEADERS=*
+ARG STABLE_PLUGIN_URL=https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions
+
+# Environment variables
+ENV CATALINA_HOME=/opt/apache-tomcat-${TOMCAT_VERSION}
+ENV GDAL_GRASS_VERSION=$GDAL_GRASS_VERSION
+ENV GEOSERVER_VERSION=$GS_VERSION
+ENV MARLIN_VERSION=$MARLIN_VERSION
+ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
+ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
+ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass78/lib/"
+ENV CORS_ENABLED=$CORS_ENABLED
+ENV CORS_ALLOWED_ORIGINS=$CORS_ALLOWED_ORIGINS
+ENV CORS_ALLOWED_METHODS=$CORS_ALLOWED_METHODS
+ENV CORS_ALLOWED_HEADERS=$CORS_ALLOWED_HEADERS
+ENV DEBIAN_FRONTEND=noninteractive
+ENV INSTALL_EXTENSIONS=false
+ENV STABLE_EXTENSIONS=''
+ENV STABLE_PLUGIN_URL=$STABLE_PLUGIN_URL
+ENV ADDITIONAL_LIBS_DIR=/opt/additional_libs/
+ENV ADDITIONAL_FONTS_DIR=/opt/additional_fonts/
+
+# see http://docs.geoserver.org/stable/en/user/production/container.html
+ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
+    -Djava.awt.headless=true -server \
+    -Dfile.encoding=UTF-8 \
+    -Djavax.servlet.request.encoding=UTF-8 \
+    -Djavax.servlet.response.encoding=UTF-8 \
+    -D-XX:SoftRefLRUPolicyMSPerMB=36000 \
+    -Xbootclasspath/a:$CATALINA_HOME/lib/marlin.jar \
+    -Xbootclasspath/a:$CATALINA_HOME/lib/marlin-sun-java2d.jar \
+    -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine \
+    -Dorg.geotools.coverage.jaiext.enabled=true"
+
+COPY --from=builder /tmp/gdal-grass-1.0.0/gdal-grass_1.0.0-1_amd64.deb /tmp/
+
+# init
+RUN apt update && \
+    apt -y upgrade && \
+    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk grass-core && \
+    rm -rf $CATALINA_HOME/webapps/* && \
+    apt clean && \
+    wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb && \
+    dpkg -i libgdal-java_1.0_all.deb && \
+    rm libgdal-java_1.0_all.deb && \
+    dpkg -i /tmp/gdal-grass_1.0.0-1_amd64.deb && \
+    rm /tmp/gdal-grass_1.0.0-1_amd64.deb && \
+    rm -rf /var/cache/apt/* && \
+    rm -rf /var/lib/apt/lists/* && \
+    echo /usr/lib/grass78/lib > /etc/ld.so.conf.d/grass.conf && \
+    ldconfig
+
 WORKDIR /opt/
-RUN rm -rf /tmp/gdal-grass-${GDAL_GRASS_VERSION}
-RUN wget -q https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
-RUN tar xf apache-tomcat-${TOMCAT_VERSION}.tar.gz
-RUN rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
+RUN wget -q https://dlcdn.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    tar xf apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    rm apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/ROOT && \
+    rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/docs && \
+    rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/examples
 
 WORKDIR /tmp
 
@@ -99,8 +163,9 @@ RUN cat org/geoserver/web/css/minimalistic.css >> org/geoserver/web/css/geoserve
 COPY ./modifications.js org/geoserver/web/js/modifications.js
 RUN sed -i 's|</wicket:head>|<wicket:link><script type="text/javascript" src="js/modifications.js"></script></wicket:link></wicket:head>|g' org/geoserver/web/GeoServerBasePage.html
 
-RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar *
-RUN cd .. && rm -rf tmp_extract
+RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar * && \
+    cd .. && \
+    rm -rf tmp_extract
 
 WORKDIR /tmp
 COPY ./settings.xml .
@@ -137,7 +202,8 @@ RUN wget -q https://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-l
     mv /tmp/jai-1_1_3/lib/*.jar $CATALINA_HOME/lib/ && \
     mv /tmp/jai-1_1_3/lib/*.so $JAVA_HOME/lib/ && \
     mv /tmp/jai_imageio-1_1/lib/*.jar $CATALINA_HOME/lib/ && \
-    mv /tmp/jai_imageio-1_1/lib/*.so $JAVA_HOME/lib/
+    mv /tmp/jai_imageio-1_1/lib/*.so $JAVA_HOME/lib/ && \
+    rm *tar.gz
 
 # uninstall JAI default installation from geoserver to avoid classpath conflicts
 # see http://docs.geoserver.org/latest/en/user/production/java.html#install-native-jai-and-imageio-extensions
@@ -149,9 +215,9 @@ RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-
     wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$(echo "$MARLIN_VERSION" | sed "s/\./_/g")/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
-RUN apt purge -y maven make g++ zip wget curl checkinstall && \
+RUN apt purge -y zip unzip wget curl && \
     apt autoremove --purge -y && \
-    rm -rf /tmp/* /var/cache/apt/*
+    rm -rf /tmp/*
 
 # copy scripts
 COPY *.sh /opt/
