@@ -2,9 +2,11 @@ FROM ubuntu:22.04 AS builder
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG TOMCAT_VERSION=9.0.64
+ARG TOMCAT_VERSION=9.0.68
 ARG GS_VERSION=2.21.1
-ARG GDAL_GRASS_VERSION=1.0.0
+ARG GRASS_VERSION_FULL=8.2.0
+ARG GRASS_VERSION=82
+ARG GDAL_GRASS_VERSION=1.0.1
 ARG MARLIN_VERSION=0.9.4.5
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
@@ -17,12 +19,14 @@ ARG STABLE_PLUGIN_URL=https://sourceforge.net/projects/geoserver/files/GeoServer
 
 # Environment variables
 ENV CATALINA_HOME=/opt/apache-tomcat-${TOMCAT_VERSION}
+ENV GRASS_VERSION_FULL=$GRASS_VERSION_FULL
+ENV GRASS_VERSION=$GRASS_VERSION
 ENV GDAL_GRASS_VERSION=$GDAL_GRASS_VERSION
 ENV GEOSERVER_VERSION=$GS_VERSION
 ENV MARLIN_VERSION=$MARLIN_VERSION
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
-ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass78/lib/"
+ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass${GRASS_VERSION}/lib/"
 ENV CORS_ENABLED=$CORS_ENABLED
 ENV CORS_ALLOWED_ORIGINS=$CORS_ALLOWED_ORIGINS
 ENV CORS_ALLOWED_METHODS=$CORS_ALLOWED_METHODS
@@ -48,20 +52,33 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 
 # init
 RUN apt update && apt -y upgrade && \
-    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk grass-dev libpq-dev make g++ checkinstall && \
+    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk libpq-dev \
+    devscripts make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
+
+RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ kinetic universe" >> /etc/apt/sources.list
+RUN apt update
+RUN apt-get source grass
+RUN apt build-dep grass -y
+WORKDIR /grass-${GRASS_VERSION_FULL}
+RUN debuild -b -uc -us
+RUN echo /usr/lib/grass${GRASS_VERSION}/lib > /etc/ld.so.conf.d/grass.conf && ldconfig
+
+# install GRASS GIS packages for GDAL-GRASS driver compilation
+RUN dpkg -i /grass-core_${GRASS_VERSION_FULL}*_amd64.deb \
+    /grass-dev_${GRASS_VERSION_FULL}*_amd64.deb \
+    /grass-doc_${GRASS_VERSION_FULL}*_all.deb
 
 WORKDIR /tmp
 RUN wget -q --no-check-certificate --content-disposition https://github.com/OSGeo/gdal-grass/archive/refs/tags/${GDAL_GRASS_VERSION}.tar.gz
 RUN tar xf gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
 RUN rm gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
-RUN echo /usr/lib/grass78/lib > /etc/ld.so.conf.d/grass.conf
 WORKDIR /tmp/gdal-grass-${GDAL_GRASS_VERSION}
 RUN ./configure \
  --prefix=/usr/local \
  --with-postgres-includes=/usr/include/postgresql \
  --with-gdal=/usr/bin/gdal-config \
- --with-grass=/usr/lib/grass78/ \
+ --with-grass=/usr/lib/grass${GRASS_VERSION}/ \
  --with-autoload="/usr/lib/gdalplugins/" \
  --with-ld-shared="g++ -shared"
 
@@ -71,9 +88,11 @@ FROM ubuntu:22.04
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
-ARG TOMCAT_VERSION=9.0.64
+ARG TOMCAT_VERSION=9.0.68
 ARG GS_VERSION=2.21.1
-ARG GDAL_GRASS_VERSION=1.0.0
+ARG GRASS_VERSION_FULL=8.2.0
+ARG GRASS_VERSION=82
+ARG GDAL_GRASS_VERSION=1.0.1
 ARG MARLIN_VERSION=0.9.4.5
 ARG GS_DATA_PATH=./geoserver_data/
 ARG ADDITIONAL_LIBS_PATH=./additional_libs/
@@ -86,12 +105,14 @@ ARG STABLE_PLUGIN_URL=https://sourceforge.net/projects/geoserver/files/GeoServer
 
 # Environment variables
 ENV CATALINA_HOME=/opt/apache-tomcat-${TOMCAT_VERSION}
+ENV GRASS_VERSION_FULL=$GRASS_VERSION_FULL
+ENV GRASS_VERSION=$GRASS_VERSION
 ENV GDAL_GRASS_VERSION=$GDAL_GRASS_VERSION
 ENV GEOSERVER_VERSION=$GS_VERSION
 ENV MARLIN_VERSION=$MARLIN_VERSION
 ENV GEOSERVER_DATA_DIR=/opt/geoserver_data/
 ENV GEOSERVER_LIB_DIR=$CATALINA_HOME/webapps/geoserver/WEB-INF/lib/
-ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass78/lib/"
+ENV EXTRA_JAVA_OPTS="-Xms256m -Xmx1g -Djava.libary.path=/usr/lib/jni/:/usr/lib/grass${GRASS_VERSION}/lib/"
 ENV CORS_ENABLED=$CORS_ENABLED
 ENV CORS_ALLOWED_ORIGINS=$CORS_ALLOWED_ORIGINS
 ENV CORS_ALLOWED_METHODS=$CORS_ALLOWED_METHODS
@@ -115,22 +136,31 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
     -Dsun.java2d.renderer=org.marlin.pisces.PiscesRenderingEngine \
     -Dorg.geotools.coverage.jaiext.enabled=true"
 
-COPY --from=builder /tmp/gdal-grass-1.0.0/gdal-grass_1.0.0-1_amd64.deb /tmp/
+COPY --from=builder /grass-core_${GRASS_VERSION_FULL}*_amd64.deb /tmp/
+COPY --from=builder /grass-doc_${GRASS_VERSION_FULL}*_all.deb /tmp/
+COPY --from=builder /tmp/gdal-grass-${GDAL_GRASS_VERSION}/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb /tmp/
 
 # init
 RUN apt update && \
     apt -y upgrade && \
-    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk grass-core && \
+    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk \
+    libbz2-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libfftw3-dev fakeroot libjs-jquery \
+    libcairo2-dev libgdal-dev libzstd-dev libpq-dev libproj-dev python3-numpy \
+    python3-pil python3-ply python3-six && \
     rm -rf $CATALINA_HOME/webapps/* && \
     apt clean && \
     wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb && \
     dpkg -i libgdal-java_1.0_all.deb && \
     rm libgdal-java_1.0_all.deb && \
-    dpkg -i /tmp/gdal-grass_1.0.0-1_amd64.deb && \
-    rm /tmp/gdal-grass_1.0.0-1_amd64.deb && \
+    apt install -y --no-install-recommends  -f /tmp/grass-doc_${GRASS_VERSION_FULL}*_all.deb && \
+    apt install -y --no-install-recommends  -f /tmp/grass-core_${GRASS_VERSION_FULL}*_amd64.deb && \
+    rm /tmp/grass-core_${GRASS_VERSION_FULL}*_amd64.deb && \
+    rm /tmp/grass-doc_${GRASS_VERSION_FULL}*_all.deb && \
+    dpkg -i /tmp/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb && \
+    rm /tmp/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb && \
     rm -rf /var/cache/apt/* && \
     rm -rf /var/lib/apt/lists/* && \
-    echo /usr/lib/grass78/lib > /etc/ld.so.conf.d/grass.conf && \
+    echo /usr/lib/grass${GRASS_VERSION}/lib > /etc/ld.so.conf.d/grass.conf && \
     ldconfig
 
 WORKDIR /opt/
@@ -218,6 +248,11 @@ RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-
 RUN apt purge -y zip unzip wget curl && \
     apt autoremove --purge -y && \
     rm -rf /tmp/*
+
+# test GDAL-GRASS driver
+RUN grass /usr/lib/grass${GRASS_VERSION}/demolocation/PERMANENT --exec r.mapcalc "testmap = 1.1" && \
+    gdalinfo /usr/lib/grass${GRASS_VERSION}/demolocation/PERMANENT/cellhd/testmap && \
+    grass /usr/lib/grass${GRASS_VERSION}/demolocation/PERMANENT --exec g.remove type=raster name=testmap -f
 
 # copy scripts
 COPY *.sh /opt/
