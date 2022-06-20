@@ -66,9 +66,8 @@ RUN debuild -b -uc -us
 RUN echo /usr/lib/grass${GRASS_VERSION}/lib > /etc/ld.so.conf.d/grass.conf && ldconfig
 
 # install GRASS GIS packages for GDAL-GRASS driver compilation
-RUN dpkg -i /grass-core_${GRASS_VERSION_FULL}*_amd64.deb \
-    /grass-dev_${GRASS_VERSION_FULL}*_amd64.deb \
-    /grass-doc_${GRASS_VERSION_FULL}*_all.deb
+RUN apt install -y --no-install-recommends -f /grass-core_${GRASS_VERSION_FULL}*_amd64.deb \
+    /grass-dev_${GRASS_VERSION_FULL}*_amd64.deb
 
 WORKDIR /tmp
 RUN wget -q --no-check-certificate --content-disposition https://github.com/OSGeo/gdal-grass/archive/refs/tags/${GDAL_GRASS_VERSION}.tar.gz
@@ -138,15 +137,13 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
     -Dorg.geotools.coverage.jaiext.enabled=true"
 
 COPY --from=builder /grass-core_${GRASS_VERSION_FULL}*_amd64.deb /tmp/
-COPY --from=builder /grass-dev_${GRASS_VERSION_FULL}*_amd64.deb /tmp/
-COPY --from=builder /grass-doc_${GRASS_VERSION_FULL}*_all.deb /tmp/
 COPY --from=builder /tmp/gdal-grass-${GDAL_GRASS_VERSION}/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb /tmp/
 
 # init
 RUN apt update && \
     apt -y upgrade && \
     apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk \
-    libbz2-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libfftw3-dev fakeroot libjs-jquery \
+    libbz2-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libfftw3-dev \
     libcairo2-dev libgdal-dev libzstd-dev libpq-dev libproj-dev python3-numpy \
     python3-pil python3-ply python3-six && \
     rm -rf $CATALINA_HOME/webapps/* && \
@@ -154,12 +151,8 @@ RUN apt update && \
     wget -q https://nexus.terrestris.de/repository/raw-public/debian/libgdal-java_1.0_all.deb && \
     dpkg -i libgdal-java_1.0_all.deb && \
     rm libgdal-java_1.0_all.deb && \
-    dpkg -i /tmp/grass-core_${GRASS_VERSION_FULL}*_amd64.deb \
-      /tmp/grass-dev_${GRASS_VERSION_FULL}*_amd64.deb \
-      /tmp/grass-doc_${GRASS_VERSION_FULL}*_all.deb && \
+    apt install -y --no-install-recommends -f /tmp/grass-core_${GRASS_VERSION_FULL}*_amd64.deb && \
     rm /tmp/grass-core_${GRASS_VERSION_FULL}*_amd64.deb && \
-    rm /tmp/grass-dev_${GRASS_VERSION_FULL}*_amd64.deb && \
-    rm /tmp/grass-doc_${GRASS_VERSION_FULL}*_all.deb && \
     dpkg -i /tmp/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb && \
     rm /tmp/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb && \
     rm -rf /var/cache/apt/* && \
