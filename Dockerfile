@@ -143,7 +143,7 @@ COPY --from=builder /tmp/gdal-grass-${GDAL_GRASS_VERSION}/gdal-grass_${GDAL_GRAS
 # init
 RUN apt update && \
     apt -y upgrade && \
-    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk \
+    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk git maven \
     libbz2-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libfftw3-dev fakeroot libjs-jquery \
     libcairo2-dev libgdal-dev libzstd-dev libpq-dev libproj-dev python3-numpy \
     python3-pil python3-ply python3-six && \
