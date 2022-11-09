@@ -245,7 +245,7 @@ RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-
     wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$(echo "$MARLIN_VERSION" | sed "s/\./_/g")/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
-RUN apt purge -y zip unzip wget curl && \
+RUN apt purge -y && \
     apt autoremove --purge -y && \
     rm -rf /tmp/*
 
