@@ -201,23 +201,14 @@ WORKDIR /tmp
 COPY ./settings.xml .
 # use fake version 2.15.6 to avoid build error
 RUN echo ${GEOSERVER_VERSION} > /tmp/version.txt; echo "2.15.6" >> /tmp/version.txt; \
-    if(test $(sort -V /tmp/version.txt|head -n 1) != "2.15.6"); then \
+    if (test $(sort -V /tmp/version.txt|head -n 1) != "2.15.6"); then \
         echo "Skipping installation of GeoStyler due to version incompatibility."; \
     else \
-        if ! (curl --head --silent --fail https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar > /dev/null); then \
-            echo "GeoStyler extension not available in OSGeo repo for GeoServer version ${GEOSERVER_VERSION}! Trying to build on sources now." ; \
-            git clone --depth 1 --no-checkout --branch ${GEOSERVER_VERSION} https://github.com/geoserver/geoserver.git ; \
-            cd geoserver ; \
-            # checkout only the sources we need
-            git checkout ${GEOSERVER_VERSION} -- src/community/geostyler ; \
-            cd src/community/geostyler ; \
-            echo "Building the GeoStyler extension now. This will take some time. Be patient!" ; \
-            mvn -s "/tmp/settings.xml" -q -B -e -T 2C install ; \
-            cp target/gs-geostyler-${GEOSERVER_VERSION}.jar ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar ; \
-        else \
-            echo "Downloading GeoStyler extension from OSGeo repo now."; \
-            wget -q -O ${GEOSERVER_LIB_DIR}gs-geostyler-${GEOSERVER_VERSION}.jar https://repo.osgeo.org/repository/Geoserver-releases/org/geoserver/community/gs-geostyler/$GEOSERVER_VERSION/gs-geostyler-$GEOSERVER_VERSION.jar; \
-        fi \
+        echo "Building the GeoStyler extension now. This will take some time. Be patient!" ; \
+        git clone --branch v1.0.0 https://github.com/geostyler/geostyler-geoserver-plugin.git ; \
+        cd geostyler-geoserver-plugin ; \
+        mvn -s "/tmp/settings.xml" -q -B -e -T 2C install ; \
+        cp target/gs-geostyler-1.0.0.jar ${GEOSERVER_LIB_DIR}gs-geostyler-1.0.0.jar ; \
     fi
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
