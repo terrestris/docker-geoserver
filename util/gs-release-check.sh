@@ -62,6 +62,7 @@ for GS_VERSION in $GITHUB_GS_VERSIONS; do
         fi
         git checkout -b "v$GS_VERSION" > /dev/null 2>&1
         sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$GS_VERSION;g" ../Dockerfile
+        sed -i "s;^        - GS_VERSION=[0-9.]\+;        - GS_VERSION=$GS_VERSION;g" ../docker-compose-demo.yml
         git commit --allow-empty -m "Update to version $GS_VERSION" ../Dockerfile > /dev/null 2>&1
         git push --force upstream "v$GS_VERSION"
       else
@@ -82,6 +83,7 @@ if [[ -z "$LATEST_GS_VERSION" ]]; then
 else
   git checkout master > /dev/null 2>&1
   sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$LATEST_GS_VERSION;g" ../Dockerfile
+  sed -i "s;^        - GS_VERSION=[0-9.]\+;        - GS_VERSION=$LATEST_GS_VERSION;g" ../docker-compose-demo.yml
   git commit --allow-empty -m "Update to latest version $LATEST_GS_VERSION" ../Dockerfile
   git push upstream master
 
