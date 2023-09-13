@@ -52,7 +52,7 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 
 # init
 RUN apt update && apt -y upgrade && \
-    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk libpq-dev \
+    apt install -y openssl zip gdal-bin wget curl openjdk-11-jdk libpq-dev git maven \
     devscripts make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
 
@@ -69,11 +69,11 @@ RUN dpkg -i /grass-core_${GRASS_VERSION_FULL}*_amd64.deb \
     /grass-dev_${GRASS_VERSION_FULL}*_amd64.deb \
     /grass-doc_${GRASS_VERSION_FULL}*_all.deb
 
-WORKDIR /tmp
+WORKDIR /grass-build
 RUN wget -q --no-check-certificate --content-disposition https://github.com/OSGeo/gdal-grass/archive/refs/tags/${GDAL_GRASS_VERSION}.tar.gz
 RUN tar xf gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
 RUN rm gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
-WORKDIR /tmp/gdal-grass-${GDAL_GRASS_VERSION}
+WORKDIR /grass-build/gdal-grass-${GDAL_GRASS_VERSION}
 RUN ./configure \
  --prefix=/usr/local \
  --with-postgres-includes=/usr/include/postgresql \
@@ -81,6 +81,19 @@ RUN ./configure \
  --with-grass=/usr/lib/grass${GRASS_VERSION}/ \
  --with-autoload="/usr/lib/gdalplugins/" \
  --with-ld-shared="g++ -shared"
+
+WORKDIR /geostyler-build
+COPY ./settings.xml .
+# use fake version 2.15.6 to avoid build error
+RUN echo ${GEOSERVER_VERSION} > /geostyler-build/version.txt; echo "2.15.6" >> /geostyler-build/version.txt; \
+    if (test $(sort -V /geostyler-build/version.txt|head -n 1) != "2.15.6"); then \
+        echo "Skipping installation of GeoStyler due to version incompatibility."; \
+    else \
+        echo "Building the GeoStyler extension now. This will take some time. Be patient!" ; \
+        git clone --branch v1.0.0 --depth 1 https://github.com/geostyler/geostyler-geoserver-plugin.git ; \
+        cd geostyler-geoserver-plugin ; \
+        mvn -s "/geostyler-build/settings.xml" -q -B -e -T 2C install ; \
+    fi
 
 RUN make -j2 && checkinstall && ldconfig
 
@@ -138,12 +151,13 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 
 COPY --from=builder /grass-core_${GRASS_VERSION_FULL}*_amd64.deb /tmp/
 COPY --from=builder /grass-doc_${GRASS_VERSION_FULL}*_all.deb /tmp/
-COPY --from=builder /tmp/gdal-grass-${GDAL_GRASS_VERSION}/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb /tmp/
+COPY --from=builder /grass-build/gdal-grass-${GDAL_GRASS_VERSION}/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb /tmp/
+COPY --from=builder /geostyler-build/target/gs-geostyler-1.0.0.jar ${GEOSERVER_LIB_DIR}gs-geostyler-1.0.0.jar
 
 # init
 RUN apt update && \
     apt -y upgrade && \
-    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk git maven \
+    apt install -y --no-install-recommends openssl zip unzip gdal-bin wget curl openjdk-11-jdk \
     libbz2-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libfftw3-dev fakeroot libjs-jquery \
     libcairo2-dev libgdal-dev libzstd-dev libpq-dev libproj-dev python3-numpy \
     python3-pil python3-ply python3-six && \
@@ -196,20 +210,6 @@ RUN sed -i 's|</wicket:head>|<wicket:link><script type="text/javascript" src="js
 RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar * && \
     cd .. && \
     rm -rf tmp_extract
-
-WORKDIR /tmp
-COPY ./settings.xml .
-# use fake version 2.15.6 to avoid build error
-RUN echo ${GEOSERVER_VERSION} > /tmp/version.txt; echo "2.15.6" >> /tmp/version.txt; \
-    if (test $(sort -V /tmp/version.txt|head -n 1) != "2.15.6"); then \
-        echo "Skipping installation of GeoStyler due to version incompatibility."; \
-    else \
-        echo "Building the GeoStyler extension now. This will take some time. Be patient!" ; \
-        git clone --branch v1.0.0 https://github.com/geostyler/geostyler-geoserver-plugin.git ; \
-        cd geostyler-geoserver-plugin ; \
-        mvn -s "/tmp/settings.xml" -q -B -e -T 2C install ; \
-        cp target/gs-geostyler-1.0.0.jar ${GEOSERVER_LIB_DIR}gs-geostyler-1.0.0.jar ; \
-    fi
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
