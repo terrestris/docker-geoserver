@@ -4,8 +4,8 @@ FROM ubuntu:22.04 AS builder
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG TOMCAT_VERSION=9.0.68
 ARG GS_VERSION=2.23.2
-ARG GRASS_VERSION_FULL=8.2.0
-ARG GRASS_VERSION=82
+ARG GRASS_VERSION_FULL=7.8.7
+ARG GRASS_VERSION=78
 ARG GDAL_GRASS_VERSION=1.0.1
 ARG MARLIN_VERSION=0.9.4.5
 ARG GS_DATA_PATH=./geoserver_data/
@@ -56,13 +56,11 @@ RUN apt update && apt -y upgrade && \
     devscripts make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
 
-RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ kinetic universe" >> /etc/apt/sources.list
-RUN apt update
-RUN apt-get source grass
-RUN apt build-dep grass -y
-WORKDIR /grass-${GRASS_VERSION_FULL}
-RUN debuild -b -uc -us
-RUN echo /usr/lib/grass${GRASS_VERSION}/lib > /etc/ld.so.conf.d/grass.conf && ldconfig
+RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list && \
+    apt update && apt-get source grass && apt build-dep grass -y && \
+  cd /grass-${GRASS_VERSION_FULL} && \
+  debuild -b -uc -us && \
+  echo /usr/lib/grass${GRASS_VERSION}/lib > /etc/ld.so.conf.d/grass.conf && ldconfig
 
 # install GRASS GIS packages for GDAL-GRASS driver compilation
 RUN dpkg -i /grass-core_${GRASS_VERSION_FULL}*_amd64.deb \
@@ -70,9 +68,9 @@ RUN dpkg -i /grass-core_${GRASS_VERSION_FULL}*_amd64.deb \
     /grass-doc_${GRASS_VERSION_FULL}*_all.deb
 
 WORKDIR /grass-build
-RUN wget -q --no-check-certificate --content-disposition https://github.com/OSGeo/gdal-grass/archive/refs/tags/${GDAL_GRASS_VERSION}.tar.gz
-RUN tar xf gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
-RUN rm gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
+RUN wget -q --no-check-certificate --content-disposition https://github.com/OSGeo/gdal-grass/archive/refs/tags/${GDAL_GRASS_VERSION}.tar.gz && \
+  tar xf gdal-grass-${GDAL_GRASS_VERSION}.tar.gz && \
+  rm gdal-grass-${GDAL_GRASS_VERSION}.tar.gz
 WORKDIR /grass-build/gdal-grass-${GDAL_GRASS_VERSION}
 RUN ./configure \
  --prefix=/usr/local \
@@ -175,7 +173,9 @@ RUN apt update && \
     rm -rf /var/cache/apt/* && \
     rm -rf /var/lib/apt/lists/* && \
     echo /usr/lib/grass${GRASS_VERSION}/lib > /etc/ld.so.conf.d/grass.conf && \
-    ldconfig
+    ldconfig && \
+    apt purge -y && \
+    apt autoremove --purge -y;
 
 WORKDIR /opt/
 RUN wget -q https://archive.apache.org/dist/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
@@ -197,17 +197,17 @@ RUN wget -q -O /tmp/geoserver.zip http://downloads.sourceforge.net/project/geose
 
 # apply custom css by extracting JAR,
 # replacing css and repacking the JAR
-RUN mkdir -p ${GEOSERVER_LIB_DIR}tmp_extract
-WORKDIR ${GEOSERVER_LIB_DIR}tmp_extract
-
-RUN unzip -q ../gs-web-core-${GEOSERVER_VERSION}.jar
 COPY ./minimalistic.css org/geoserver/web/css/minimalistic.css
-RUN cat org/geoserver/web/css/minimalistic.css >> org/geoserver/web/css/geoserver.css
-
 COPY ./modifications.js org/geoserver/web/js/modifications.js
-RUN sed -i 's|</wicket:head>|<wicket:link><script type="text/javascript" src="js/modifications.js"></script></wicket:link></wicket:head>|g' org/geoserver/web/GeoServerBasePage.html
 
-RUN zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar * && \
+RUN mkdir -p ${GEOSERVER_LIB_DIR}tmp_extract && \
+    cd ${GEOSERVER_LIB_DIR}tmp_extract && \
+    mv /minimalistic.css org/geoserver/web/css/minimalistic.css && \
+    unzip -q ../gs-web-core-${GEOSERVER_VERSION}.jar && \
+    cat org/geoserver/web/css/minimalistic.css >> org/geoserver/web/css/geoserver.css && \
+    mv /modifications.js org/geoserver/web/js/modifications.js && \
+    sed -i 's|</wicket:head>|<wicket:link><script type="text/javascript" src="js/modifications.js"></script></wicket:link></wicket:head>|g' org/geoserver/web/GeoServerBasePage.html && \
+    zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar * && \
     cd .. && \
     rm -rf tmp_extract
 
@@ -236,9 +236,7 @@ RUN wget -q -O $CATALINA_HOME/lib/marlin.jar https://github.com/bourgesl/marlin-
     wget -q -O $CATALINA_HOME/lib/marlin-sun-java2d.jar https://github.com/bourgesl/marlin-renderer/releases/download/v$(echo "$MARLIN_VERSION" | sed "s/\./_/g")/marlin-$MARLIN_VERSION-Unsafe-sun-java2d.jar
 
 # cleanup
-RUN apt purge -y && \
-    apt autoremove --purge -y && \
-    rm -rf /tmp/*
+RUN rm -rf /tmp/*
 
 # test GDAL-GRASS driver
 RUN grass /usr/lib/grass${GRASS_VERSION}/demolocation/PERMANENT --exec r.mapcalc "testmap = 1.1" && \
