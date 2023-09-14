@@ -4,8 +4,8 @@ FROM ubuntu:22.04 AS builder
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG TOMCAT_VERSION=9.0.68
 ARG GS_VERSION=2.23.2
-ARG GRASS_VERSION_FULL=7.8.7
-ARG GRASS_VERSION=78
+ARG GRASS_VERSION_FULL=8.3.0
+ARG GRASS_VERSION=83
 ARG GDAL_GRASS_VERSION=1.0.1
 ARG MARLIN_VERSION=0.9.4.5
 ARG GS_DATA_PATH=./geoserver_data/
@@ -56,9 +56,10 @@ RUN apt update && apt -y upgrade && \
     devscripts make g++ checkinstall && \
     rm -rf $CATALINA_HOME/webapps/*
 
-RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ jammy universe" >> /etc/apt/sources.list && \
+RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ mantic universe" >> /etc/apt/sources.list && \
     apt update && apt-get source grass && apt build-dep grass -y && \
-  cd /grass-${GRASS_VERSION_FULL} && \
+  cd /grass-${GRASS_VERSION_FULL} || \
+    (echo "GRASS_VERSION_FULL ($GRASS_VERSION_FULL) does not seem to match installed version" && ls / | grep "grass-" && false) && \
   debuild -b -uc -us && \
   echo /usr/lib/grass${GRASS_VERSION}/lib > /etc/ld.so.conf.d/grass.conf && ldconfig
 
@@ -80,6 +81,8 @@ RUN ./configure \
  --with-autoload="/usr/lib/gdalplugins/" \
  --with-ld-shared="g++ -shared"
 
+RUN make -j2 && checkinstall && ldconfig
+
 WORKDIR /geostyler-build
 COPY ./settings.xml .
 # use fake version 2.15.6 to avoid build error
@@ -93,16 +96,14 @@ RUN echo ${GEOSERVER_VERSION} > /geostyler-build/version.txt; echo "2.15.6" >> /
         mvn -s "/geostyler-build/settings.xml" -q -B -e -T 2C install ; \
     fi
 
-RUN make -j2 && checkinstall && ldconfig
-
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS runner
 
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG TOMCAT_VERSION=9.0.68
 ARG GS_VERSION=2.23.2
-ARG GRASS_VERSION_FULL=8.2.0
-ARG GRASS_VERSION=82
+ARG GRASS_VERSION_FULL=8.3.0
+ARG GRASS_VERSION=83
 ARG GDAL_GRASS_VERSION=1.0.1
 ARG MARLIN_VERSION=0.9.4.5
 ARG GS_DATA_PATH=./geoserver_data/
@@ -150,7 +151,7 @@ ENV CATALINA_OPTS="\$EXTRA_JAVA_OPTS \
 COPY --from=builder /grass-core_${GRASS_VERSION_FULL}*_amd64.deb /tmp/
 COPY --from=builder /grass-doc_${GRASS_VERSION_FULL}*_all.deb /tmp/
 COPY --from=builder /grass-build/gdal-grass-${GDAL_GRASS_VERSION}/gdal-grass_${GDAL_GRASS_VERSION}-1_amd64.deb /tmp/
-COPY --from=builder /geostyler-build/target/gs-geostyler-1.0.0.jar ${GEOSERVER_LIB_DIR}gs-geostyler-1.0.0.jar
+COPY --from=builder /geostyler-build/geostyler-geoserver-plugin/target/gs-geostyler-1.0.0.jar /tmp/gs-geostyler-1.0.0.jar
 
 # init
 RUN apt update && \
@@ -185,46 +186,47 @@ RUN wget -q https://archive.apache.org/dist/tomcat/tomcat-9/v${TOMCAT_VERSION}/b
     rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/docs && \
     rm -rf /opt/apache-tomcat-${TOMCAT_VERSION}/webapps/examples
 
-WORKDIR /tmp
-
-# install geoserver
-RUN wget -q -O /tmp/geoserver.zip http://downloads.sourceforge.net/project/geoserver/GeoServer/$GEOSERVER_VERSION/geoserver-$GEOSERVER_VERSION-war.zip && \
+# download & install geoserver
+# apply custom css by extracting JAR,
+# replacing css and repacking the JAR
+WORKDIR /geoserver-install
+COPY ./minimalistic.css minimalistic.css
+COPY ./modifications.js modifications.js
+RUN wget -q -O /geoserver-install/geoserver.zip http://downloads.sourceforge.net/project/geoserver/GeoServer/$GEOSERVER_VERSION/geoserver-$GEOSERVER_VERSION-war.zip && \
     unzip geoserver.zip geoserver.war -d $CATALINA_HOME/webapps && \
     mkdir -p $CATALINA_HOME/webapps/geoserver && \
     unzip -q $CATALINA_HOME/webapps/geoserver.war -d $CATALINA_HOME/webapps/geoserver && \
     rm $CATALINA_HOME/webapps/geoserver.war && \
-    mkdir -p $GEOSERVER_DATA_DIR
-
-# apply custom css by extracting JAR,
-# replacing css and repacking the JAR
-COPY ./minimalistic.css org/geoserver/web/css/minimalistic.css
-COPY ./modifications.js org/geoserver/web/js/modifications.js
-
-RUN mkdir -p ${GEOSERVER_LIB_DIR}tmp_extract && \
-    cd ${GEOSERVER_LIB_DIR}tmp_extract && \
-    mv /minimalistic.css org/geoserver/web/css/minimalistic.css && \
+    mv /tmp/gs-geostyler-1.0.0.jar ${GEOSERVER_LIB_DIR}gs-geostyler-1.0.0.jar && \
+    mkdir -p $GEOSERVER_DATA_DIR && \
+    cd $GEOSERVER_LIB_DIR && \
+    mkdir tmp-extract && \
+    cd tmp-extract && \
     unzip -q ../gs-web-core-${GEOSERVER_VERSION}.jar && \
+    mv /geoserver-install/minimalistic.css org/geoserver/web/css/minimalistic.css && \
     cat org/geoserver/web/css/minimalistic.css >> org/geoserver/web/css/geoserver.css && \
-    mv /modifications.js org/geoserver/web/js/modifications.js && \
+    mv /geoserver-install/modifications.js org/geoserver/web/js/modifications.js && \
     sed -i 's|</wicket:head>|<wicket:link><script type="text/javascript" src="js/modifications.js"></script></wicket:link></wicket:head>|g' org/geoserver/web/GeoServerBasePage.html && \
     zip -qr9 ../gs-web-core-${GEOSERVER_VERSION}.jar * && \
-    cd .. && \
-    rm -rf tmp_extract
+    cd / && \
+    rm -rf geoserver-install
 
 COPY $GS_DATA_PATH $GEOSERVER_DATA_DIR
 COPY $ADDITIONAL_LIBS_PATH $GEOSERVER_LIB_DIR
 COPY $ADDITIONAL_FONTS_PATH /usr/share/fonts/truetype/
 
 # install java advanced imaging
+WORKDIR /jai-install
 RUN wget -q https://download.java.net/media/jai/builds/release/1_1_3/jai-1_1_3-lib-linux-amd64.tar.gz && \
     wget -q https://download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-amd64.tar.gz && \
     gunzip -c jai-1_1_3-lib-linux-amd64.tar.gz | tar xf - && \
     gunzip -c jai_imageio-1_1-lib-linux-amd64.tar.gz | tar xf - && \
-    mv /tmp/jai-1_1_3/lib/*.jar $CATALINA_HOME/lib/ && \
-    mv /tmp/jai-1_1_3/lib/*.so $JAVA_HOME/lib/ && \
-    mv /tmp/jai_imageio-1_1/lib/*.jar $CATALINA_HOME/lib/ && \
-    mv /tmp/jai_imageio-1_1/lib/*.so $JAVA_HOME/lib/ && \
-    rm *tar.gz
+    mv jai-1_1_3/lib/*.jar $CATALINA_HOME/lib/ && \
+    mv jai-1_1_3/lib/*.so $JAVA_HOME/lib/ && \
+    mv jai_imageio-1_1/lib/*.jar $CATALINA_HOME/lib/ && \
+    mv jai_imageio-1_1/lib/*.so $JAVA_HOME/lib/ && \
+    cd .. && \
+    rm -rf jai-install
 
 # uninstall JAI default installation from geoserver to avoid classpath conflicts
 # see http://docs.geoserver.org/latest/en/user/production/java.html#install-native-jai-and-imageio-extensions
