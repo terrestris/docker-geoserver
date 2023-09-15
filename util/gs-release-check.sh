@@ -63,7 +63,10 @@ for GS_VERSION in $GITHUB_GS_VERSIONS; do
         git checkout -b "v$GS_VERSION" > /dev/null 2>&1
         sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$GS_VERSION;g" ../Dockerfile
         sed -i "s;^        - GS_VERSION=[0-9.]\+;        - GS_VERSION=$GS_VERSION;g" ../docker-compose-demo.yml
-        git commit --allow-empty -m "Update to version $GS_VERSION" ../Dockerfile ../docker-compose-demo.yml > /dev/null 2>&1
+        git commit --allow-empty -m 'Update to version $GS_VERSION
+
+
+on-behalf-of: @terrestris info@terrestris.de' ../Dockerfile ../docker-compose-demo.yml > /dev/null 2>&1
         git push --force upstream "v$GS_VERSION"
       else
         echo "v${GS_VERSION} is not yet available on SourceForge! Skipping docker build for now."
@@ -84,7 +87,10 @@ else
   git checkout master > /dev/null 2>&1
   sed -i "s;^ARG GS_VERSION=[0-9.]\+;ARG GS_VERSION=$LATEST_GS_VERSION;g" ../Dockerfile
   sed -i "s;^        - GS_VERSION=[0-9.]\+;        - GS_VERSION=$LATEST_GS_VERSION;g" ../docker-compose-demo.yml
-  git commit --allow-empty -m "Update to latest version $LATEST_GS_VERSION" ../Dockerfile ../docker-compose-demo.yml
+  git commit --allow-empty -m 'Update to latest version $LATEST_GS_VERSION
+
+
+on-behalf-of: @terrestris info@terrestris.de' ../Dockerfile ../docker-compose-demo.yml
   git push upstream master
 
   echo "Finished! Latest geoserver version is $LATEST_GS_VERSION!"
