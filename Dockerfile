@@ -3,7 +3,7 @@ FROM ubuntu:22.04 AS builder
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG TOMCAT_VERSION=9.0.68
-ARG GS_VERSION=2.24.1
+ARG GS_VERSION=2.23.4
 ARG GRASS_VERSION_FULL=8.3.0
 ARG GRASS_VERSION=83
 ARG GDAL_GRASS_VERSION=1.0.1
@@ -101,7 +101,7 @@ FROM ubuntu:22.04 AS runner
 # The GS_VERSION argument could be used like this to overwrite the default:
 # docker build --build-arg GS_VERSION=2.11.3 -t geoserver:2.11.3 .
 ARG TOMCAT_VERSION=9.0.68
-ARG GS_VERSION=2.24.1
+ARG GS_VERSION=2.23.4
 ARG GRASS_VERSION_FULL=8.3.0
 ARG GRASS_VERSION=83
 ARG GDAL_GRASS_VERSION=1.0.1
